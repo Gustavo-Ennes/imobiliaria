@@ -14,20 +14,20 @@ module.exports = gql`
 
   type Mutation{
 
-    createProperty(input: PropertyInput): Property
-    updateProperty(id:ID!, input: PropertyInput): Property
+    createProperty(input: PropertyCreateInput): Property
+    updateProperty(id:ID!, input: PropertyUpdateInput): Property
     deleteProperty(id: ID): String
 
-    createLand(input: LandInput): Land
-    updateLand(id: ID!, input: LandInput): Land
+    createLand(input: LandCreateInput): Land
+    updateLand(id: ID!, input: LandUpdateInput): Land
     deleteLand(id: ID!): String
 
-    createOwner(input: OwnerInput): Owner
-    updateOwner(id: ID!, input: OwnerInput): Owner
+    createOwner(input: OwnerCreateInput): Owner
+    updateOwner(id: ID!, input: OwnerUpdateInput): Owner
     deleteOwner(id: ID!): String
 
-    createTenant(input: TenantInput): Tenant
-    updateTenant(id: ID!, input:TenantInput): Tenant
+    createTenant(input: TenantCreateInput): Tenant
+    updateTenant(id: ID!, input:TenantUpdateInput): Tenant
     deleteTenant(id: ID!): String
     
   }

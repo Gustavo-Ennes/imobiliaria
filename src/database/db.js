@@ -1,6 +1,16 @@
-const { MongoClient } = require("mongodb");
-// Replace the uri string with your MongoDB deployment's connection string.
-const uri = `
-mongodb+srv://kratos:${process.env.DB_PASS}@cluster0.fhhom.mongodb.net?retryWrites=true&w=majority
-`
-module.exports = new MongoClient(uri)
+require("dotenv").config()
+
+const mongoose = require('mongoose');
+
+const connect = async() => {
+  await mongoose.connect(process.env.DB_HOST);
+  var db = mongoose.connection;
+  db.on('error', console.error.bind(console, 'connection error:'));
+  db.once('open', function callback () {
+    console.log("database connected.");
+  })
+}
+
+connect()
+
+module.exports = mongoose
