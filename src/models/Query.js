@@ -29,6 +29,12 @@ module.exports = gql`
     createTenant(input: TenantCreateInput): Tenant
     updateTenant(id: ID!, input:TenantUpdateInput): Tenant
     deleteTenant(id: ID!): String
+
+    login(username: String, password: String): Boolean
+    logout(username: String): Boolean
+    # the type here is to say if it's an Owner or a Tenant
+    # implement this with sessions 
+    singIn(input: OwnerCreateInput, type: String): Boolean
     
   }
 `

@@ -1,11 +1,15 @@
-const landResolvers = require('./Land').resolvers
-const propertyResolvers = require('./Property').resolvers
-const tenantResolvers = require("./Tenant").resolvers
-const ownerResolvers = require("./Owner").resolvers
-const landMutations = require('./Land').mutations
-const propertyMutations = require('./Property').mutations
-const tenantMutations = require("./Tenant").mutations
-const ownerMutations = require("./Owner").mutations
+const landResolvers = require('./models/Land').resolvers
+const propertyResolvers = require('./models/Property').resolvers
+const tenantResolvers = require("./models/Tenant").resolvers
+const ownerResolvers = require("./models/Owner").resolvers
+const landMutations = require('./models/Land').mutations
+const propertyMutations = require('./models/Property').mutations
+const tenantMutations = require("./models/Tenant").mutations
+const ownerMutations = require("./models/Owner").mutations
+const {loginResolver, logoutResolver, singInResolver} = require("./middleware/index")
+
+
+
 module.exports = {
   Query:{
     lands:  landResolvers.lands,
@@ -29,6 +33,9 @@ module.exports = {
     deleteOwner: ownerMutations.delete,
     createTenant: tenantMutations.create,
     updateTenant: tenantMutations.update,
-    deleteTenant: tenantMutations.delete
+    deleteTenant: tenantMutations.delete,
+    login: loginResolver,
+    logout: logoutResolver,
+    singIn: singInResolver
   }
 }
