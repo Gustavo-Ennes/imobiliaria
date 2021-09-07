@@ -5,7 +5,6 @@
 require("dotenv").config()
 
 const bodyParser = require('body-parser')
-const cookieParser = require("cookie-parser")
 const cors = require('cors');
 const express = require('express');
 const session = require("express-session")
@@ -29,11 +28,9 @@ const app = express();
 /*
   setup Graphql
 */
-const typeDefs = require('./src/models/typeDefs.js')
-const resolvers = require('./src/models/resolvers.js')
-const context = ({ req, res  }) => {
-  
-}
+const typeDefs = require('./src/typeDefs.js')
+const resolvers = require('./src/resolvers.js')
+const context = async ({ req, res }) => ({ req, res })
 const {makeExecutableSchema} = require('graphql-tools')
 const schema = makeExecutableSchema({
   typeDefs, 
@@ -48,7 +45,6 @@ const schema = makeExecutableSchema({
 app.use(
   cors(), 
   bodyParser.json(), 
-  cookieParser(), 
   session(sessionOptions)
 );
 app.use('/graphql',graphqlExpress({schema}))
