@@ -12,24 +12,23 @@ const propertyTests = require('./properties')
 describe("Database connection", () => {
   it("Should be connected to Atlas", async() => {
 
-    const connect = async() => {
-      await Mongoose.connect(process.env.DB_HOST_TEST);
-      var db = Mongoose.connection;
-      db.on('error', () => { expect(0).to.equal(1) });
-      db.once('open', function callback () {
-        expect(1).to.equal(1)
-      })
+    try{
+      await Mongoose.connect(process.env.DB_HOST_TEST)
+      expect(Mongoose.connection.readyState).to.equal(1)
+    } catch(err){
+      console.log(err)
     }
-    
-    await connect()
 
   })
 })
-
 
 describe("Integration", () =>{
   tenantsTests
   ownersTests
   landTests
   propertyTests
+})
+
+describe("Authentication", () => {
+  
 })
