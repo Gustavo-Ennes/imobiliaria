@@ -23,8 +23,11 @@ const Tenant =  new Mongoose.model(
 module.exports = {
   mongoose: Tenant,
   typeDef: gql`
+    scalar Date
+    scalar MongoObjectId
+
     type Tenant{  
-      id: ID!
+      _id: MongoObjectId!
       name: String
       phone: String
       username: String
@@ -38,6 +41,8 @@ module.exports = {
       address_district: String
       address_city: String
       address_zip: String
+      createdAt: Date!
+      updatedAt: Date!
     }
   `,
   resolvers: {
@@ -49,7 +54,7 @@ module.exports = {
       }
     },
     tenantsById: async(parent, args, context, info) => {
-      const tenant = await Tenant.findOne({id: args.id})
+      const tenant = await Tenant.findOne({_id: args.id})
       return tenant
     }
   },
@@ -58,6 +63,7 @@ module.exports = {
   mutations: {
     create: async(parent, args, context, info) => {
       try{
+        console.log(JSON.stringify(args.input, null, 2))
         await Tenant.create(args.input)
         return args.input
       }catch(err){

@@ -1,24 +1,27 @@
 const {gql} = require('graphql-tag')
 const Mongoose = require("../database/db")
 
+const Land = new Mongoose.model(
+  "Land",
+  new Mongoose.Schema({
+    ownerId: {type: String, required: true},
+    size: {type: Number, required: true},
+    infrastructures: [String],
+    documents: [String],
+    address_street: {type: String, required: true},
+    address_number: {type: Number, required: true},
+    address_complementation: String,
+    address_reference: String,
+    address_district: {type: String, required: true},
+    address_city: {type: String, required: true},
+    address_zip: {type: String, required: true},
+    value_sell: Number,
+  }, {timestamps: true})
+)
+
+
 module.exports = {
-  mongoose: new Mongoose.model(
-    "Land",
-    new Mongoose.Schema({
-      ownerId: {type: String, required: true},
-      size: {type: Number, required: true},
-      infrastructures: [String],
-      documents: [String],
-      address_street: {type: String, required: true},
-      address_number: {type: Number, required: true},
-      address_complementation: String,
-      address_reference: String,
-      address_district: {type: String, required: true},
-      address_city: {type: String, required: true},
-      address_zip: {type: String, required: true},
-      value_sell: Number,
-    }, {timestamps: true})
-  ),
+  mongoose: Land,
   typeDef: gql`
     type Land{
       id: ID!
@@ -38,22 +41,43 @@ module.exports = {
     }
   `,
   resolvers: {
-    lands: () => {
-
+    lands: async(parent, args, context, info) => {
+      try{
+        return await Land.find()
+      }catch(err){
+        console.log(err)
+      }
     },
-    landById: () => {
-
+    landById: async(parent, args, context, info) => {
+      const land = await Land.findOne({_id: args.id})
+      return land
     }
   },
+
+  // TESTAR MUTATIONS E RESOLVERS
   mutations: {
-    create: () => {
-
+    create: async(parent, args, context, info) => {
+      try{
+        console.log(JSON.stringify(args.input, null, 2))
+        await Land.create(args.input)
+        return args.input
+      }catch(err){
+        console.log(err)
+      }
     },
-    update: () => {
-
+    update: async(parent, args, context, info) => {
+      try{
+        const land = await Land.findOne({_id: args.id})
+        console.log(`land: ${land}`)
+        await Land.updateOne({_id: args.id}, {$set: args.input})
+        return args.input
+      }catch(err){
+        console.log(err)
+      }
     },
-    delete: () => {
-
+    delete: async (parent, args, context, info) => {
+      await Land.deleteOne({_id: args.id})
+      return `Land id:${args.id} deleted.`
     }
   }
 }

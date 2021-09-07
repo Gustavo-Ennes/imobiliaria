@@ -11,7 +11,7 @@ module.exports = {
     lands:  landResolvers.lands,
     landById: landResolvers.landById,
     properties: propertyResolvers.properties,
-    propertyById: propertyResolvers.propertiesById,
+    propertyById: propertyResolvers.propertyById,
     tenants: tenantResolvers.tenants,
     tenantById: tenantResolvers.tenantsById,
     owners: ownerResolvers.owners,
