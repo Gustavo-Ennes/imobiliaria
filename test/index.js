@@ -1,37 +1,35 @@
+require("dotenv").config()
+
 const chai = require('chai')
 const expect = chai.expect
-const chaiHTTP = require("chai-http")
-const client = require('../src/database/db')
-const app = require('../app')
+const Mongoose = require("mongoose")
+const tenantsTests = require('./tenants')
+const ownersTests = require("./owners")
+const landTests = require('./lands')
+const propertyTests = require('./properties')
 
-chai.use(chaiHTTP)
 
 describe("Database connection", () => {
-  it("Should connect with database", async () => {
-    try{
-      await client.connect()
-    }catch(err){
-      console.log(err)
-      expect("Database connected").to.equal("Database disconnected")
-    } finally{
-      await client.close()
-      expect(1).to.equal(1)
+  it("Should be connected to Atlas", async() => {
+
+    const connect = async() => {
+      await Mongoose.connect(process.env.DB_HOST_TEST);
+      var db = Mongoose.connection;
+      db.on('error', () => { expect(0).to.equal(1) });
+      db.once('open', function callback () {
+        expect(1).to.equal(1)
+      })
     }
+    
+    await connect()
+
   })
 })
 
-describe("Database insertions", async () => {
 
-  before(async () => {
-    const db = client.db('imobiliaria')
-    const coll = db.collection('owner')
-    const doc = {
-      name: "Gustavo",
-      phone: "120389713",
-      username: "kratos",
-      cellphone: "23123231",
-      address_street: "17",
-      address_number: ""
-    }
-  })
+describe("Integration", () =>{
+  tenantsTests
+  ownersTests
+  landTests
+  propertyTests
 })
