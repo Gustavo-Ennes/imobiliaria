@@ -2,6 +2,10 @@ const Tenant = require("../src/models/Tenant").mongoose
 const Owner = require("../src/models/Owner").mongoose
 const Property = require("../src/models/Property").mongoose
 const Land = require("../src/models/Land").mongoose
+const { encrypt } = require('./cyrpt')
+
+const simplePassword = '$2b$10$3b7HoDAlE2Yf58eMlkG.m.XNTORfe/YOv1j/sOkgWHPbVKbhO7d/O'
+
 
 const randomUsername = () => {
   let string = ''
@@ -82,14 +86,15 @@ const randomPhone = () => {
 
 
 
-const  randomTenantPayload = () => {
+const randomTenantPayload = () => {
   return {
     name: randomName(),
     phone: randomPhone(),
     username: randomUsername(),
+    password: simplePassword,
     cellphone: randomPhone(),
     address_street: 'Street 19',
-    address_number: "999",
+    address_number: 999,
     address_district: "SP",
     address_city: "São Paulo",
     address_zip: "123-2222",
@@ -188,11 +193,13 @@ const removeRandomData = async() => {
   console.log("Properties droped")
 }
 
+
 module.exports = {
   addRandomData, 
   removeRandomData, 
   randomTenantPayload,
   randomOwnerPayload,
   randomPropertyPayload,
-  randomLandPayload
+  randomLandPayload,
+  simplePassword
 }
