@@ -7,6 +7,7 @@ const Owner = new Mongoose.model(
     name: {type: String, required: true},
     phone: {type: String, required: true, unique:true},
     username: {type: String, required: true, unique: true},
+    password: {type: String, required: true},
     cellphone: {type: String, required: true, unique: true},
     documents: [String],
     properties: [String],
@@ -25,11 +26,12 @@ module.exports = {
 
   mongoose: Owner,
   typeDef: gql`
-    type Owner {
+    type Owner{
       id: ID!
       name: String
       phone: String
       username: String
+      password: String
       cellphone: String
       properties: [Property]
       lands: [Land]
@@ -41,6 +43,8 @@ module.exports = {
       address_district: String
       address_city: String
       address_zip: String
+      createdAt: String
+      modifiedAt: String
     }
   `,
   resolvers: {

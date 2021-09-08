@@ -6,7 +6,7 @@ const landMutations = require('./models/Land').mutations
 const propertyMutations = require('./models/Property').mutations
 const tenantMutations = require("./models/Tenant").mutations
 const ownerMutations = require("./models/Owner").mutations
-const {loginResolver, logoutResolver, singInResolver} = require("./middleware/index")
+const {loginResolver, logoutResolver, signInResolver} = require("./middleware/index")
 
 
 
@@ -36,6 +36,6 @@ module.exports = {
     deleteTenant: tenantMutations.delete,
     login: loginResolver,
     logout: logoutResolver,
-    singIn: singInResolver
+    signIn: signInResolver
   }
 }

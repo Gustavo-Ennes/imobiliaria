@@ -34,7 +34,7 @@ module.exports = gql`
     logout(username: String): Boolean
     # the type here is to say if it's an Owner or a Tenant
     # implement this with sessions 
-    singIn(input: OwnerCreateInput, type: String): Boolean
+    signIn(input: OwnerCreateInput, type: String): Boolean
     
   }
 `

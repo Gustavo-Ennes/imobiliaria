@@ -7,6 +7,7 @@ const Tenant =  new Mongoose.model(
     name: {type: String, required: true},
     phone: {type: String, required: true, unique:true},
     username: {type: String, required: true, unique: true},
+    password: {type: String, required: true},
     cellphone: {type: String, required: true, unique: true},
     documents: [String],
     rented: [String],
@@ -23,14 +24,12 @@ const Tenant =  new Mongoose.model(
 module.exports = {
   mongoose: Tenant,
   typeDef: gql`
-    scalar Date
-    scalar MongoObjectId
-
     type Tenant{  
-      _id: MongoObjectId!
+      id: ID!
       name: String
       phone: String
       username: String
+      password: String
       cellphone: String
       rented: [Property]
       documents: [String]
@@ -41,8 +40,8 @@ module.exports = {
       address_district: String
       address_city: String
       address_zip: String
-      createdAt: Date!
-      updatedAt: Date!
+      createdAt: String
+      updatedAt: String
     }
   `,
   resolvers: {
@@ -63,7 +62,6 @@ module.exports = {
   mutations: {
     create: async(parent, args, context, info) => {
       try{
-        console.log(JSON.stringify(args.input, null, 2))
         await Tenant.create(args.input)
         return args.input
       }catch(err){
@@ -73,7 +71,6 @@ module.exports = {
     update: async(parent, args, context, info) => {
       try{
         const tenant = await Tenant.findOne({_id: args.id})
-        console.log(`tenant: ${tenant}`)
         await Tenant.updateOne({_id: args.id}, {$set: args.input})
         return args.input
       }catch(err){
