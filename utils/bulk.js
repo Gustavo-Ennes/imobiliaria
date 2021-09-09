@@ -1,11 +1,8 @@
-const Tenant = require("../src/models/Tenant").mongoose
-const Owner = require("../src/models/Owner").mongoose
-const Property = require("../src/models/Property").mongoose
-const Land = require("../src/models/Land").mongoose
-const { encrypt } = require('./cyrpt')
-
+const Tenant = require('../src/models/Tenant')
+const Owner = require('../src/models/Owner')
+const Property = require('../src/models/Property')
+const Land = require('../src/models/Land')
 const simplePassword = '$2b$10$3b7HoDAlE2Yf58eMlkG.m.XNTORfe/YOv1j/sOkgWHPbVKbhO7d/O'
-
 
 const randomUsername = () => {
   let string = ''
@@ -162,19 +159,15 @@ const addRandomData = async () => {
 
     for(let i = 0; i < tenantsQtd; i++){
       aux = await Tenant.create(randomTenantPayload())
-      console.log(`Tenant created: ${aux.name}`)
     }
     for(let i = 0; i < ownersQtd; i++){      
       aux = await Owner.create(randomOwnerPayload())
-      console.log(`Owner created: ${aux.name}`)      
     }
     for(let i = 0; i < landsQtd; i++){
-      aux = await Land.create(randomLandPayload())  
-      console.log(`Land created: ${aux.size} mt2 size`)    
+      aux = await Land.create(randomLandPayload())    
     }
     for(let i = 0; i < propertiesQtd; i++){
-      aux = await Property.create(randomPropertyPayload())    
-      console.log(`Property created: ${aux.privateSize} mt2 private area`)      
+      aux = await Property.create(randomPropertyPayload())       
     }
   }catch(err){
     console.log(err)
