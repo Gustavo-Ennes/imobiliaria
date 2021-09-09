@@ -1,25 +1,24 @@
-const Tenant = require("../../src/models/Tenant").mongoose
+const Tenant = require('../../src/models/Tenant')
 const bulk = require("../../utils/bulk")
 const app = require('../../app')
 const request = require('supertest')
-const {gql} = require('graphql-tag')
 const chai = require('chai')
 const expect = chai.expect
 const simplePassword = bulk.simplePassword
 
-module.exports = describe("> Tenants", () =>{
+
+describe("> Tenants", () =>{
   //check by name
 
   describe(' ~ read', () => {
     before((done) => {
       const payload = bulk.randomTenantPayload()
       aux = payload.name
-      console.log(payload)
       Tenant.create( payload ).then(()=>{done()})
     })
 
     it("Should see a tenant", (done)=>{
-      const query = gql`
+      const query = `
         query{
           tenants{
             name
@@ -52,13 +51,13 @@ module.exports = describe("> Tenants", () =>{
   describe(' ~ write', () => {
 
     it("Should add a tenant", (done) => {
-      const query = gql`
+      const query = `
         mutation{
           createTenant(input:{
             name: "Gustavo Ennes",
             phone: "18 1923876134",
             username: "kratos.de.si",
-            password: "${ simplePassword }"
+            password: "${ simplePassword }",
             cellphone: "18 0192384783",
             address_street: "17",
             address_number: 212,
@@ -106,7 +105,7 @@ module.exports = describe("> Tenants", () =>{
 
     it("Should update an existing tenant", (done) => {
 
-      const query = gql`
+      const query = `
         mutation{
           updateTenant(
             id: "${id}",
@@ -153,7 +152,7 @@ module.exports = describe("> Tenants", () =>{
     })
 
     it("Should delete a tenant", ( done ) => {
-      const query = gql`
+      const query = `
         mutation{
           deleteTenant(id: "${id}")
         }

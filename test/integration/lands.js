@@ -1,36 +1,43 @@
-const Land = require("../../src/models/Land").mongoose
-const Owner = require("../../src/models/Owner").mongoose
+const Land = require('../../src/models/Land')
+const Owner = require('../../src/models/Owner')
 const bulk = require("../../utils/bulk")
 const app = require('../../app')
 const request = require('supertest')
-const {gql} = require('graphql-tag')
 const chai = require('chai')
 const expect = chai.expect
 
-module.exports = describe("> Lands", () =>{
+
+describe("> Lands", () =>{
   //check by name
 
   describe(' ~ read', () => {
     // in this I have to create a Owner to the Land because it's required
-    before((done) => {
-      const landPayload = bulk.randomLandPayload()
-      const ownerPayload = bulk.randomOwnerPayload()
+    before(async() => {
+      try{
+        const landPayload = bulk.randomLandPayload()
+        const ownerPayload = bulk.randomOwnerPayload()
 
-      Owner.create(ownerPayload).then((owner) => {
-        landPayload.ownerId = owner._id
-        Land.create( landPayload ).then(() => {
-          done()
+        Owner.create(ownerPayload)
+        .catch((err) => console.log(err))
+        .then((owner) => {
+          
+          landPayload.ownerId = owner._id
+          Land.create( landPayload ).then((land) => {
+            done()
+          })
         })
-      })
+      }catch(err){
+        console.log(err)
+      }
     })
 
     it("Should see a land", (done)=>{
-      const query = gql`
-        query{
+      const query = `
+        {
           lands{
             ownerId
           }        
-      }`
+        }`
 
       request(app)
         .post('/graphql')
@@ -71,7 +78,7 @@ module.exports = describe("> Lands", () =>{
     })
 
     it("Should add a land", (done) => {
-      const query = gql`
+      const query = `
         mutation{
           createLand(input:{
             ownerId: "${ownerId}",
@@ -134,7 +141,7 @@ module.exports = describe("> Lands", () =>{
 
     it("Should update an existing land", (done) => {
 
-      const query = gql`
+      const query = `
         mutation{
           updateLand(
             id: "${id}",
@@ -188,7 +195,7 @@ module.exports = describe("> Lands", () =>{
     })
 
     it("Should delete a land", ( done ) => {
-      const query = gql`
+      const query = `
         mutation{
           deleteLand(id: "${id}")
         }

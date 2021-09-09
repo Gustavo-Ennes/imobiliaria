@@ -1,13 +1,13 @@
-const Property = require("../../src/models/Property").mongoose
-const Owner = require("../../src/models/Owner").mongoose
+const Property = require('../../src/models/Property')
+const Owner = require('../../src/models/Owner')
 const bulk = require("../../utils/bulk")
 const app = require('../../app')
 const request = require('supertest')
-const {gql} = require('graphql-tag')
 const chai = require('chai')
 const expect = chai.expect
 
-module.exports = describe("> Properties", () =>{
+
+describe("> Properties", () =>{
   //check by name
 
   describe(' ~ read', () => {
@@ -21,11 +21,13 @@ module.exports = describe("> Properties", () =>{
         Property.create( propertyPayload ).then(() => {
           done()
         })
+        .catch((err)=>console.error(err))
       })
+      .catch((err)=>console.error(err))
     })
 
     it("Should see a property", (done)=>{
-      const query = gql`
+      const query = `
         query{
           properties{
             ownerId 
@@ -45,7 +47,6 @@ module.exports = describe("> Properties", () =>{
             console.log(err)
             return done(err)
           }
-          console.log(`The properties: ${JSON.stringify(res.body.data.properties, 2, null)}`)
           expect(res.body.data).to.have.property('properties')
           expect(res.body.data.properties).to.be.an('array')
           return done();
@@ -74,7 +75,7 @@ module.exports = describe("> Properties", () =>{
     })
 
     it("Should add a property", (done) => {
-      const query = gql`
+      const query = `
         mutation{
           createProperty(input: {
             ownerId: "${ownerId}",
@@ -97,6 +98,8 @@ module.exports = describe("> Properties", () =>{
           }
         }
       `
+      // MUDEI O NOME PARA MUTATION, NÃO FUNCIONOU
+      // VER O QUE HÁ DE ERRADO COM OS TESTES
       request(app)
         .post('/graphql')
         .send({query})
@@ -143,7 +146,7 @@ module.exports = describe("> Properties", () =>{
 
     it("Should update an existing property", (done) => {
 
-      const query = gql`
+      const query = `
         mutation{
           updateProperty(
             id: "${id}",
@@ -198,7 +201,7 @@ module.exports = describe("> Properties", () =>{
     })
 
     it("Should delete a property", ( done ) => {
-      const query = gql`
+      const query = `
         mutation{
           deleteProperty(id: "${id}")
         }

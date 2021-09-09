@@ -1,25 +1,23 @@
-const Owner = require("../../src/models/Owner").mongoose
+const Owner = require('../../src/models/Owner')
 const bulk = require("../../utils/bulk")
 const app = require('../../app')
 const request = require('supertest')
-const {gql} = require('graphql-tag')
 const chai = require('chai')
 const expect = chai.expect
 const { simplePassword } = require("../../utils/bulk")
 
-module.exports = describe("> Owners", () =>{
+describe("> Owners", () =>{
   //check by name
 
   describe(' ~ read', () => {
     before((done) => {
       const payload = bulk.randomOwnerPayload()
       aux = payload.name
-      console.log(payload)
       Owner.create( payload ).then(()=>{done()})
     })
 
     it("Should see a owner", (done)=>{
-      const query = gql`
+      const query = `
         query{
           owners{
             name
@@ -52,14 +50,14 @@ module.exports = describe("> Owners", () =>{
   describe(' ~ write', () => {
 
     it("Should add a owner", (done) => {
-      const query = gql`
+      const query = `
         mutation{
           createOwner(input:{
             name: "Gustavo Ennes",
             phone: "18 1923876134",
             username: "kratos.de.si",
             cellphone: "18 0192384783",
-            password: "${ simplePassword }"
+            password: "${ simplePassword }",
             address_street: "17",
             address_number: 212,
             address_district: "SP",
@@ -106,7 +104,7 @@ module.exports = describe("> Owners", () =>{
 
     it("Should update an existing owner", (done) => {
 
-      const query = gql`
+      const query = `
         mutation{
           updateOwner(
             id: "${id}",
@@ -153,7 +151,7 @@ module.exports = describe("> Owners", () =>{
     })
 
     it("Should delete a owner", ( done ) => {
-      const query = gql`
+      const query = `
         mutation{
           deleteOwner(id: "${id}")
         }

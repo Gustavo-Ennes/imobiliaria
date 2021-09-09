@@ -8,7 +8,6 @@ const bodyParser = require('body-parser')
 const cors = require('cors');
 const express = require('express');
 const session = require("express-session")
-const  {graphiqlExpress,graphqlExpress} = require('apollo-server-express')
 const sessionOptions = {
   secret: 'keyboard cat',
   cookie: {
@@ -30,14 +29,16 @@ const app = express();
 */
 const typeDefs = require('./src/typeDefs.js')
 const resolvers = require('./src/resolvers.js')
-const context = async ({ req, res }) => ({ req, res })
-const {makeExecutableSchema} = require('graphql-tools')
-const schema = makeExecutableSchema({
-  typeDefs, 
-  resolvers,
-  context
-})
 
+const { graphqlHTTP } = require('express-graphql');
+const { buildSchema } = require('graphql');
+
+// Construct a schema, using GraphQL schema language
+const schema = buildSchema(typeDefs)
+
+// const loggingMiddleware = (req, res, next) => {
+//     next()
+// }
 
 /*
   applying middlewares
@@ -46,9 +47,14 @@ app.use(
   cors(), 
   bodyParser.json(), 
   session(sessionOptions)
-);
-app.use('/graphql',graphqlExpress({schema}))
-app.use('/graphiql',graphiqlExpress({endpointURL:'/graphql'}))
+  // loggingMiddleware
+)
+
+app.use('/graphql', graphqlHTTP({
+  schema: schema,
+  rootValue: resolvers,
+  graphiql: true
+}))
 
 
 
