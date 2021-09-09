@@ -6,8 +6,6 @@ const bulk = require('../../utils/bulk')
 const chai = require('chai')
 const expect = chai.expect
 
-require("mongoose")
-
 describe("Authentication", () => {
 
   describe("Sign In", () => {

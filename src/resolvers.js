@@ -59,6 +59,7 @@ const resolvers = {
   createOwner: async(args, request) => {
     try{
       await Owner.create(args.input)
+      request.session.username = args.username
       return args.input
     }catch(err){
       console.log(err)
@@ -139,6 +140,7 @@ const resolvers = {
   createTenant: async(args, request) => {
     try{
       await Tenant.create(args.input)
+      request.session.username = args.username
       return args.input
     }catch(err){
       console.log(err)
@@ -165,13 +167,11 @@ const resolvers = {
         res =  true
       } else{
         const user = await Tenant.findOne({username: args.username})
-
         if(!user){
           user = await Owner.findOne({username: args.username})
 
           if(user){
             request.session.username = user.username
-            request.session.save()
             res = true
           }
         } else {
@@ -204,7 +204,7 @@ const resolvers = {
       }else{
         console.log("SignIn attempt failed: there's no such type of user.")
         return false
-      }
+      } 
     }catch(err){
       console.log(err)
       return false
