@@ -1,15 +1,19 @@
-const Mongoose = require('mongoose');
+const Mongoose = require('mongoose')
+const conn = async() => {
+  try {
+    // for mocha test hooks that didn't use supertest
+    if(!process.env.PROD){
+      require('dotenv').config()
+    }
 
-const connect = async() => {
-  await Mongoose.connect(process.env.TEST ? process.env.DB_HOST_TEST : process.env.DB_HOST_TEST);
-  var db = Mongoose.connection;
-  db.on('error', console.error.bind(console, 'connection error:'));
-  db.once('open', function callback () {
-    console.log("database connected.");
-    isDatabaseOpened = true
-  })
+    await Mongoose.connect(
+      process.env.PROD ? process.env.DB_HOST : process.env.DB_HOST_TEST
+    )
+  } catch (error) {
+    console.error(error)
+  }
 }
 
-connect()
+conn()
 
 module.exports = Mongoose
