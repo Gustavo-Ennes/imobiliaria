@@ -89,6 +89,12 @@ type Property{
   likes: Int
 }
 
+type AuthReturn{
+  isSigned: Boolean
+  isLogged: Boolean
+  username: String
+}
+
 type Query{
   tenants(input: TenantUpdateInput): [Tenant]
   owners(input: OwnerUpdateInput): [Owner]
@@ -118,11 +124,11 @@ type Mutation{
   updateTenant(id: ID!, input:TenantUpdateInput): Tenant
   deleteTenant(id: ID!): String
 
-  login(username: String, password: String): Boolean
-  logout(username: String): Boolean
+  login(username: String, password: String): AuthReturn
+  logout(username: String): AuthReturn
   # the type here is to say if it's an Owner or a Tenant
   # implement this with sessions 
-  signIn(input: OwnerCreateInput, type: String): Boolean
+  signIn(input: OwnerCreateInput, type: String): AuthReturn
   
 }
 

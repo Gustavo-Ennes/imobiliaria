@@ -165,6 +165,7 @@ const resolvers = {
   },
   login: async(args, request)=> {
     let res = false
+    let username
     try{
 
       if(request.session && request.session.userID){
@@ -175,6 +176,7 @@ const resolvers = {
           user = await Owner.findOne({username: args.username})
 
           if(user){
+            username = user.username
             request.session.username = user.username
             res = true
           }
@@ -185,17 +187,18 @@ const resolvers = {
     }catch(err){
       console.log(err)
     }
-    return res
+    return {isLogged: res, username}
   },
   logout: (args, request) => {
     if(request.session){
       request.session.destroy()
     }
-    return true
+    return {isSigned: false, username: null}
   },
   signIn: async (args, request) => {
     const input = args.input
     const type = args.type
+    const result = (isSigned) => {return {isSigned, username: request.session.username}}
 
     try{
 
@@ -207,13 +210,16 @@ const resolvers = {
         await resolvers.createOwner(args, request)
       }else{
         console.log("SignIn attempt failed: there's no such type of user.")
-        return false
+        return result(false)
       } 
     }catch(err){
       console.log(err)
-      return false
+      return result(false)
     }    
-    return true
+    if(request.session){
+      request.session.username = input.username
+    }
+    return result(true)
   }
 }
 

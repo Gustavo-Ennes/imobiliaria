@@ -6,6 +6,8 @@ const Owner = require("../../src/models/Owner")
 const Land = require("../../src/models/Land")
 const Property = require("../../src/models/Property")
 const Tenant = require('../../src/models/Tenant')
+const request = require('supertest')
+const app = require('../../app')
 
 describe("> Resolvers", () => {
 
@@ -13,7 +15,7 @@ describe("> Resolvers", () => {
   describe(" ~ lands", () => {
     
     it("Should return an array", async() => {
-      const lands = await resolvers.lands({}, {})
+      const lands = await resolvers.lands({input:{}}, {})
       expect(lands).to.be.an('array')
     })
 
@@ -21,7 +23,7 @@ describe("> Resolvers", () => {
   describe(" ~ tenants", () => {
     
     it("Should return an array", async() => {
-      const tenants = await resolvers.tenants({}, {})
+      const tenants = await resolvers.tenants({input:{}}, {})
       expect(tenants).to.be.an('array')
     })
 
@@ -29,7 +31,7 @@ describe("> Resolvers", () => {
   describe(" ~ owners", () => {
     
     it("Should return an array", async() => {
-      const owners = await resolvers.owners({}, {})
+      const owners = await resolvers.owners({input:{}}, {})
       expect(owners).to.be.an('array')
     })
 
@@ -37,7 +39,7 @@ describe("> Resolvers", () => {
   describe(" ~ properties", () => {
     
     it("Should return an array", async() => {
-      const properties = await resolvers.properties({}, {})
+      const properties = await resolvers.properties({input:{}}, {})
       expect(properties).to.be.an('array')
     })
 
@@ -330,6 +332,55 @@ describe("> Resolvers", () => {
       await resolvers.deleteOwner({id}, {})
       const o = await Owner.findOne({_id:id})
       expect(o).to.equal(null)
+    })
+  })
+
+  // AUTH
+  describe(" ~ auth", () => {
+    describe("signIn", () => {
+      let username
+
+      it('Should Sign In', async() => {
+        const input = randomOwnerPayload()
+        username = input.username
+        const type = 'owner'
+        const query = `
+          mutation{
+            signIn(
+              type: "${type}",
+              input: ${input}
+            )
+          }
+        `
+        console.log({query})
+        
+        request(app)
+        .post('/graphql')
+        .send({query})
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end(function(err, res) {
+          if(err)console.log(err);
+          console.log(res.body)
+          expect(res.body.data.signed).to.equal(true)
+          expect(res.body.data).to.have.property('session')
+          expect(res.body.data.request.session).to.have.property('username')
+          expect(res.body.data.request.session.username).not.to.equal(null)
+        })
+      })
+
+      after(async() => {
+        await Owner.collection.drop()
+      })
+    })
+
+    describe("login", () => {
+      
+    })
+
+    describe("logout", () => {
+      
     })
   })
 })
