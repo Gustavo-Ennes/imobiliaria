@@ -90,10 +90,10 @@ type Property{
 }
 
 type Query{
-  tenants: [Tenant]
-  owners: [Owner]
-  properties: [Property]
-  lands: [Land]
+  tenants(input: TenantUpdateInput): [Tenant]
+  owners(input: OwnerUpdateInput): [Owner]
+  properties(input: PropertyUpdateInput): [Property]
+  lands(input: LandUpdateInput): [Land]
   tenantById(id: ID!): Tenant
   ownerById(id: ID!): Owner
   propertyById(id: ID!): Property   

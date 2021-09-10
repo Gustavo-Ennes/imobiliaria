@@ -7,7 +7,7 @@ const Tenant = require('./models/Tenant')
 const resolvers = {
   lands: async(args, request) => {
     try{
-        return await Land.find()
+        return await Land.find(args.input)
       }catch(err){
         console.log(err)
     }
@@ -43,7 +43,7 @@ const resolvers = {
   },
   owners: async(args, request) => {
     try{
-      return await Owner.find()
+      return await Owner.find(args.input)
     }catch(err){
       console.log(err)
     }
@@ -59,7 +59,9 @@ const resolvers = {
   createOwner: async(args, request) => {
     try{
       const o = await Owner.create(args.input)
-      request.session.username = args.username
+      if(request.session){
+        request.session.username = args.username
+      }
       return o
     }catch(err){
       console.log(err)
@@ -84,7 +86,7 @@ const resolvers = {
   },
   properties: async(args, request) => {
     try{
-      return await Property.find()
+      return await Property.find(args.input)
     }catch(err){
       console.log(err)
     }
@@ -124,7 +126,7 @@ const resolvers = {
   },
   tenants: async(args, request) => {
     try{
-      return await Tenant.find()
+      return await Tenant.find(args.input)
     }catch(err){
       console.log(err)
     }
@@ -140,7 +142,9 @@ const resolvers = {
   createTenant: async(args, request) => {
     try{
       const t = await Tenant.create(args.input)
-      request.session.username = args.username
+      if(request.session){
+        request.session.username = args.username
+      }
       return t
     }catch(err){
       console.log(err)
@@ -163,7 +167,7 @@ const resolvers = {
     let res = false
     try{
 
-      if(request.session.userID){
+      if(request.session && request.session.userID){
         res =  true
       } else{
         const user = await Tenant.findOne({username: args.username})
