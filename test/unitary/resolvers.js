@@ -9,6 +9,7 @@ const Tenant = require('../../src/models/Tenant')
 
 describe("> Resolvers", () => {
 
+  // INTIRE
   describe(" ~ lands", () => {
     
     it("Should return an array", async() => {
@@ -42,6 +43,8 @@ describe("> Resolvers", () => {
 
   })
 
+
+  // BY ID
   describe(" ~ landById", () => {
     let id
 
@@ -64,7 +67,6 @@ describe("> Resolvers", () => {
     })
 
   })
-
   describe(" ~ ownerById", () => {
     let id
 
@@ -83,7 +85,6 @@ describe("> Resolvers", () => {
     })
 
   })
-
   describe(" ~ tenantById", () => {
     let id
 
@@ -102,7 +103,6 @@ describe("> Resolvers", () => {
     })
 
   })
-
   describe(" ~ propertyById", () => {
     let id
 
@@ -125,4 +125,211 @@ describe("> Resolvers", () => {
     })
   })
 
+  // CREATION
+  describe(" ~ land create", () => {
+    it("Should return the created mongoose model", async() => {
+      const o = await Owner.create(randomOwnerPayload())
+      const lPayload = randomLandPayload()
+      lPayload.ownerId = o._id
+      
+      const l = await resolvers.createLand({input: lPayload}, {})
+
+      expect(l).to.be.an("object")
+      expect(l).to.have.property("_id")
+    })
+    after(async()=>{
+      await Land.collection.drop()
+      await Owner.collection.drop()
+    })
+  })  
+  describe(" ~ owner create", () => {
+    it("Should return the created mongoose model", async() => {
+      const o = await resolvers.createOwner({input:randomOwnerPayload()}, {})
+      expect(o).to.be.an("object")
+      expect(o).to.have.property("_id")
+    })
+    after(async()=>{
+      await Owner.collection.drop()
+    })
+  })
+  describe(" ~ tenant create", () => {
+    it("Should return the created mongoose model", async() => {
+      const t = await resolvers.createTenant({input: randomTenantPayload()}, {})
+      expect(t).to.be.an("object")
+      expect(t).to.have.property("_id")
+    })
+    after(async()=>{
+      await Tenant.collection.drop()
+    })
+  })
+  describe(" ~ property create", () => {
+    it("Should return the created mongoose model", async() => {
+      const o = await Owner.create(randomOwnerPayload())
+      const pPayload = randomPropertyPayload()
+      pPayload.ownerId = o._id
+      const p = await resolvers.createProperty({input: pPayload}, {})
+      expect(p).to.be.an("object")
+      expect(p).to.have.property("_id")
+    })
+    after(async()=>{
+      await Property.collection.drop()
+      await Owner.collection.drop()
+    })
+  })
+
+  // UPDATE
+  describe(" ~ land update", () => {
+    let alteredAttr, id
+    const newSize = 100
+
+    before(async() => {
+      const o = await Owner.create(randomOwnerPayload())
+      const lPayload = randomLandPayload()
+      lPayload.ownerId = o._id
+      const l = await resolvers.createLand({input: lPayload}, {})
+      alteredAttr = l.size
+      id = l._id
+    })
+
+    it("Should alter a size field to 100", async() => {
+      await resolvers.updateLand({id:id, input:{size: 100}}, {})
+      const l = await Land.findOne({_id: id})
+      expect(l.size).not.to.equal(alteredAttr)
+      expect(l.size).to.equal(newSize)
+    })
+
+    after(async() => {
+      await Land.collection.drop() 
+      await Owner.collection.drop()
+    })
+  })
+
+  describe(" ~ property update", () => {
+    let alteredAttr, id
+    const newSize = 100
+
+    before(async() => {
+      const o = await Owner.create(randomOwnerPayload())
+      const pPayload = randomPropertyPayload()
+      pPayload.ownerId = o._id
+      const p = await Property.create(pPayload)
+      alteredAttr = p.size
+      id = p._id
+    })
+
+    it("Should alter a size field to 100", async() => {
+      await resolvers.updateProperty({id:id, input:{size: 100}}, {})
+      const p = await Property.findOne({_id: id})
+      expect(p.size).not.to.equal(alteredAttr)
+      expect(p.size).to.equal(newSize)
+    })
+
+    after(async() => {
+      await Property.collection.drop() 
+      await Owner.collection.drop()
+    })
+  })
+
+  describe(" ~ tenant update", () => {
+    let oldUsername, id
+
+    before(async() => {
+      const t = await Tenant.create(randomTenantPayload())
+      oldUsername = t.username
+      id = t._id
+    })  
+    it("Should return a username property changed to 'kratos'", async() => {
+      await resolvers.updateTenant({id:id, input:{username: 'kratos'}}, {})
+      const t = await Tenant.findOne({_id: id})
+      expect(t.username).not.to.equal(oldUsername)
+      expect(t.username).to.equal('kratos')
+    })
+    after(async() => {
+      await Tenant.collection.drop()
+    })
+  })
+  describe(" ~ owner update", () => {
+    let oldUsername, id
+
+    before(async() => {
+      const o = await Owner.create(randomOwnerPayload())
+      oldUsername = o.username
+      id = o._id
+    })  
+    it("Should return a username property changed to 'Rick Sanchez'", async() => {
+      await resolvers.updateOwner({id:id, input:{username: 'Rick Sanchez'}}, {})
+      const o = await Owner.findOne({_id: id})
+      expect(o.username).not.to.equal(oldUsername)
+      expect(o.username).to.equal('Rick Sanchez')
+    })
+    after(async() => {
+      await Owner.collection.drop()
+    })
+  })
+
+  // DELETE 
+  describe(" ~ delete land", () => {
+    let id
+
+    before(async() => {
+      const o = await Owner.create(randomOwnerPayload())
+      const lPayload = randomLandPayload()
+      lPayload.ownerId = o._id
+      const l = await Land.create(lPayload)
+      id = l._id
+    })
+    it("Should delete a land", async() => {
+      await resolvers.deleteLand({id}, {})
+      const l = await Land.findOne({_id:id})
+      expect(l).to.equal(null)
+    })
+    after(async() => {
+      await Owner.collection.drop()
+    })
+  })
+  describe(" ~ delete property", () => {
+    let id
+
+    before(async() => {
+      const o = await Owner.create(randomOwnerPayload())
+      const pPayload = randomPropertyPayload()
+      pPayload.ownerId = o._id
+      const p = await Property.create(pPayload)
+      id = p._id
+    })
+    it("Should delete a property", async() => {
+      await resolvers.deleteProperty({id}, {})
+      const p = await Property.findOne({_id:id})
+      expect(p).to.equal(null)
+    })
+    after(async() => {
+      await Owner.collection.drop()
+    })
+  })
+  describe(" ~ delete tenant", () => {
+    let id
+
+    before(async() => {
+      const t = await Tenant.create(randomTenantPayload())
+      id = t._id
+    })
+    it("Should delete a tenant", async() => {
+      await resolvers.deleteTenant({id}, {})
+      const t = await Tenant.findOne({_id:id})
+      expect(t).to.equal(null)
+    })
+  })
+  describe(" ~ delete owner", () => {
+    let id
+
+    before(async() => {
+      const o = await Owner.create(randomOwnerPayload())
+      id = o._id
+    })
+    it("Should delete a owner", async() => {
+      await resolvers.deleteOwner({id}, {})
+      const o = await Owner.findOne({_id:id})
+      expect(o).to.equal(null)
+    })
+  })
 })
