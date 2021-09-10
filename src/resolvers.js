@@ -18,8 +18,8 @@ const resolvers = {
   },  
   createLand: async(args, request) => {
     try{
-      await Land.create(args.input)
-      return args.input
+      const land = await Land.create(args.input)
+      return land
     }catch(err){
       console.log(err)
     }
@@ -58,9 +58,9 @@ const resolvers = {
   },
   createOwner: async(args, request) => {
     try{
-      await Owner.create(args.input)
+      const o = await Owner.create(args.input)
       request.session.username = args.username
-      return args.input
+      return o
     }catch(err){
       console.log(err)
     }
@@ -99,8 +99,8 @@ const resolvers = {
   },
   createProperty: async(args, request) => {
     try{
-      await Property.create(args.input)
-      return args.input
+      const p = await Property.create(args.input)
+      return p
     }catch(err){
       console.log(err)
     }
@@ -139,9 +139,9 @@ const resolvers = {
   },
   createTenant: async(args, request) => {
     try{
-      await Tenant.create(args.input)
+      const t = await Tenant.create(args.input)
       request.session.username = args.username
-      return args.input
+      return t
     }catch(err){
       console.log(err)
     }
