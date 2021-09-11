@@ -115,7 +115,7 @@ const randomLandPayload = () => {
     size: 40 + (Math.random() * 100),
     infrastructure: [],
     address_street: 'Street 19',
-    address_number: "999",
+    address_number: 999,
     address_district: "SP",
     address_city: "São Paulo",
     address_zip: "123-2222"

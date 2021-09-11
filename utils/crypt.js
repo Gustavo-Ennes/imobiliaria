@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt")
 
-module.exports = {
+module.exports = {  
   passwordMatch: (inserted, original) => {
     const match = bcrypt.compareSync(inserted, original)
     return match
