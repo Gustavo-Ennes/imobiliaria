@@ -93,6 +93,7 @@ type AuthReturn{
   isSigned: Boolean
   isLogged: Boolean
   username: String
+  sessionRestored: Boolean
 }
 
 type Query{

@@ -27,7 +27,10 @@ describe("Authentication", () => {
               address_city: "Ilha Solteira",
               address_zip: "15.385-000"
             }
-          )
+          ){
+            isSigned
+            username
+          }
         }
       `
       request(app)
@@ -41,7 +44,8 @@ describe("Authentication", () => {
             console.log(err)
             done(err)
           } else{
-            expect(res.body.data.signIn).to.equal(true)
+            expect(res.body.data.signIn.isSigned).to.equal(true)
+            expect(res.body.data.signIn.username).to.not.equal(null)
             done()
           }
         })
@@ -65,7 +69,10 @@ describe("Authentication", () => {
 
       const query = `
         mutation{
-          login(username: "${username}", password: "${password}")
+          login(username: "${username}", password: "${password}"){
+            isLogged
+            username
+          }
         }
       `
 
@@ -77,8 +84,11 @@ describe("Authentication", () => {
         .expect(200)
         .catch((err)=>console.log(err))    
       
-
-      expect(res.body.data.login).to.equal(true)
+      if(res.body.data.login.sessionRestored){
+        console.log(" ~ login from sessionID ~ ")
+      }
+      expect(res.body.data.login.isLogged).to.equal(true)
+      expect(res.body.data.login.username).to.not.equal(null)
 
     })
 

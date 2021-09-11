@@ -8,6 +8,8 @@ const Property = require("../../src/models/Property")
 const Tenant = require('../../src/models/Tenant')
 const request = require('supertest')
 const app = require('../../app')
+const JSONGraphqlStringify = require('../../utils/jsonStringify')
+const { assertNonNullType } = require('graphql/type')
 
 describe("> Resolvers", () => {
 
@@ -348,11 +350,13 @@ describe("> Resolvers", () => {
           mutation{
             signIn(
               type: "${type}",
-              input: ${input}
-            )
+              input: ${JSONGraphqlStringify(input)}
+            ){
+              isSigned
+              username
+            }
           }
         `
-        console.log({query})
         
         request(app)
         .post('/graphql')
@@ -362,11 +366,10 @@ describe("> Resolvers", () => {
         .expect(200)
         .end(function(err, res) {
           if(err)console.log(err);
-          console.log(res.body)
-          expect(res.body.data.signed).to.equal(true)
-          expect(res.body.data).to.have.property('session')
-          expect(res.body.data.request.session).to.have.property('username')
-          expect(res.body.data.request.session.username).not.to.equal(null)
+          expect(res.body.data.signIn).to.have.property('username')
+          expect(res.body.data.signIn).to.have.property('isSigned')
+          expect(res.body.data.signIn.isSigned).to.equals(true)
+          expect(res.body.data.signIn.username).to.not.equals(null)
         })
       })
 

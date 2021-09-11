@@ -164,12 +164,17 @@ const resolvers = {
     return `Tenant id:${args.id} deleted.`
   },
   login: async(args, request)=> {
-    let res = false
-    let username
+    let isLogged = false, 
+      sessionRestored = false, 
+      username
+
     try{
 
       if(request.session && request.session.userID){
-        res =  true
+        isLogged =  true
+        username = res.username
+        sessionRestored = true
+
       } else{
         const user = await Tenant.findOne({username: args.username})
         if(!user){
@@ -178,16 +183,17 @@ const resolvers = {
           if(user){
             username = user.username
             request.session.username = user.username
-            res = true
+            isLogged = true
           }
         } else {
-          res = true
+          isLogged = true
+          username = user.username
         }
       }
     }catch(err){
       console.log(err)
     }
-    return {isLogged: res, username}
+    return {isLogged, username, sessionRestored}
   },
   logout: (args, request) => {
     if(request.session){
