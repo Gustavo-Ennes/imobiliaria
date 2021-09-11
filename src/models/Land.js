@@ -6,7 +6,13 @@ module.exports = new Mongoose.model(
     ownerId: {type: String, required: true},
     size: {type: Number, required: true},
     infrastructures: [String],
-    documents: [String],
+    documents: [
+      {
+        link: String,
+        status: String,
+        uploadDate: Date
+      }
+    ],
     address_street: {type: String, required: true},
     address_number: {type: Number, required: true},
     address_complementation: String,

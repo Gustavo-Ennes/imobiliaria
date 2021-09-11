@@ -8,7 +8,13 @@ module.exports =  new Mongoose.model(
     username: {type: String, required: true, unique: true},
     password: {type: String, required: true},
     cellphone: {type: String, required: true, unique: true},
-    documents: [String],
+    documents: [
+      {
+        link: String,
+        status: String,
+        uploadDate: Date
+      }
+    ],
     rented: [String],
     address_street: {type: String, required: true},
     address_number: {type: Number, required: true},
