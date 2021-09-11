@@ -1,3 +1,4 @@
+const session = require('express-session')
 const { passwordMatch, encrypt } = require('../utils/crypt')
 const Land = require("./models/Land")
 const Owner = require("./models/Owner")
@@ -59,7 +60,7 @@ const resolvers = {
   createOwner: async(args, request) => {
     try{
       const o = await Owner.create(args.input)
-      if(request.session){
+      if(request.session){  
         request.session.username = args.username
       }
       return o
@@ -166,7 +167,10 @@ const resolvers = {
   login: async(args, request)=> {
     let isLogged = false, 
       sessionRestored = false, 
-      username
+      username = null,
+      message = null,
+      sessionUsername = null
+    const password = '12345'
 
     try{
 
@@ -176,56 +180,82 @@ const resolvers = {
         sessionRestored = true
 
       } else{
-        const user = await Tenant.findOne({username: args.username})
+        let user = await Tenant.findOne({username: args.username})
         if(!user){
           user = await Owner.findOne({username: args.username})
 
           if(user){
-            username = user.username
-            request.session.username = user.username
-            isLogged = true
+            const isPasswordCorrect = await passwordMatch(password, user.password)
+            if(isPasswordCorrect){
+
+              username = user.username
+              if(request.session){
+                request.session.username = user.username
+              }
+              isLogged = true
+              message = `Hello, ${username}!`
+            }
+          } else{
+            message = `User '${args.username}' not found.`
           }
         } else {
           isLogged = true
           username = user.username
+          message = `Hello, ${username}!`
         }
       }
     }catch(err){
       console.log(err)
     }
-    return {isLogged, username, sessionRestored}
+    if(request.session){
+      sessionUsername = request.session.username
+    }
+    return {isLogged, username, sessionRestored, message, sessionUsername}
   },
   logout: (args, request) => {
     if(request.session){
+      username = request.session.username
       request.session.destroy()
     }
-    return {isSigned: false, username: null}
+    return {isLogged: Boolean(request.session), sessionUsername: request.session ? request.session.username : null}
   },
   signIn: async (args, request) => {
     const input = args.input
     const type = args.type
-    const result = (isSigned) => {return {isSigned, username: request.session.username}}
+    let sessionUsername = null,
+      isSigned = false,
+      username = null
 
     try{
-
       input.password = await encrypt(input.password)
 
-      if(type === 'tenant'){  
-        await resolvers.createTenant(args, request)
-      }else if (type === 'owner'){
-        await resolvers.createOwner(args, request)
+      if(type === 'tenant' || type === 'owner'){
+        if(type === 'tenant'){  
+          await resolvers.createTenant(args, request)
+        }else if (type === 'owner'){
+          await resolvers.createOwner(args, request)
+        }
+        isSigned = true
+        username = input.username
+        sessionUsername = username
+
       }else{
         console.log("SignIn attempt failed: there's no such type of user.")
-        return result(false)
       } 
     }catch(err){
       console.log(err)
-      return result(false)
     }    
+
     if(request.session){
       request.session.username = input.username
+      sessionUsername = request.session.username
     }
-    return result(true)
+
+    return {
+      isSigned,
+      sessionUsername,
+      username
+    }
   }
 }
 

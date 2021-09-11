@@ -9,7 +9,6 @@ const Tenant = require('../../src/models/Tenant')
 const request = require('supertest')
 const app = require('../../app')
 const JSONGraphqlStringify = require('../../utils/jsonStringify')
-const { assertNonNullType } = require('graphql/type')
 
 describe("> Resolvers", () => {
 
@@ -343,34 +342,14 @@ describe("> Resolvers", () => {
       let username
 
       it('Should Sign In', async() => {
-        const input = randomOwnerPayload()
-        username = input.username
-        const type = 'owner'
-        const query = `
-          mutation{
-            signIn(
-              type: "${type}",
-              input: ${JSONGraphqlStringify(input)}
-            ){
-              isSigned
-              username
-            }
-          }
-        `
-        
-        request(app)
-        .post('/graphql')
-        .send({query})
-        .set('Accept', 'application/json')
-        .expect('Content-Type', /json/)
-        .expect(200)
-        .end(function(err, res) {
-          if(err)console.log(err);
-          expect(res.body.data.signIn).to.have.property('username')
-          expect(res.body.data.signIn).to.have.property('isSigned')
-          expect(res.body.data.signIn.isSigned).to.equals(true)
-          expect(res.body.data.signIn.username).to.not.equals(null)
-        })
+        let input = randomOwnerPayload(), type = 'owner'
+        input.password = '12345'
+
+        const res = await resolvers.signIn({input, type}, {})
+
+        expect(res).to.have.property('isSigned')
+        expect(res.isSigned).to.equal(true)
+
       })
 
       after(async() => {
@@ -379,11 +358,105 @@ describe("> Resolvers", () => {
     })
 
     describe("login", () => {
+      let username
+      const password = '12345'
+
+      before(async() => {
+        const ownerPayload = randomOwnerPayload()
+        const owner = await Owner.create(ownerPayload)
+        console.log(`user created : ${JSON.stringify(owner)}`)
+        username = owner.username
+      })
+
+      it("Should log in", async() => {
+        const res = await resolvers.login({username, password}, {})
+        console.log(res.message)
+        expect(res.isLogged).to.equal(true)
+        expect(res.username).to.equal(username)
+      })
+
+      after(async () => {
+        await Owner.collection.drop()
+      })
       
     })
 
+    describe("session check", () => {
+      let username
+
+      before(async() => {
+        const o = await Owner.create(randomOwnerPayload())
+        username = o.username
+      })
+
+      it("Should return a session attr in response", async() => {
+        const query = `
+          mutation{
+            login(username: "${username}", password: "12345"){
+              isLogged
+              username
+              sessionUsername
+            }
+          }
+        `
+        const res = await request(app)
+        .post('/graphql')
+        .send({query})
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        
+        console.log(res.body.data)
+        expect(res.body.data.login.username).to.equal(username)
+        expect(res.body.data.login.isLogged).to.equal(true)
+        expect(res.body.data.login.sessionUsername).to.equal(username)
+      })
+
+      after(async() => {
+        await Owner.collection.drop()
+      })
+
+    })
+
     describe("logout", () => {
-      
+      let username
+
+      before(async() => {
+        const o = await Owner.create(randomOwnerPayload())
+        username = o.username
+      })
+
+      it("Should logout", async() => {
+        const query = `
+          mutation{
+            login(username: "${username}", password: "12345"){
+              isLogged
+              username
+              sessionUsername
+            }
+            logout(username: "${username}"){
+              isLogged
+              sessionUsername
+            }
+          }
+        `
+        const res = await request(app)
+        .post('/graphql')
+        .send({query})
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+
+        expect(res.body.data.logout).to.have.property("isLogged")
+        expect(res.body.data.logout).to.have.property("sessionUsername")
+        expect(res.body.data.logout.isLogged).to.equals(false)
+        expect(res.body.data.logout.sessionUsername).to.equals(null)
+
+      })
+
+      after(async() => {
+        await Owner.collection.drop()
+      })
     })
   })
 })
