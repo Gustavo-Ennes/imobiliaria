@@ -94,6 +94,8 @@ type AuthReturn{
   isLogged: Boolean
   username: String
   sessionRestored: Boolean
+  message: String
+  sessionUsername: String
 }
 
 type Query{
