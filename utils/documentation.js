@@ -19,7 +19,14 @@ const linkExists = async(string) => {
   }
 }
 
+const checkPdf = async(link) => {
+  if(isLink(link) && isPdf(link)){
+    const exists = await linkExists(link)
+    return exists
+  }
+}
+
 
 module.exports = {
-  checkPdf: linkExists
+  checkPdf: checkPdf
 }
