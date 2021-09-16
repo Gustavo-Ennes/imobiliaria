@@ -98,6 +98,11 @@ type AuthReturn{
   sessionUsername: String
 }
 
+type DocumentResponse{
+  message: String
+  result: String
+}
+
 type Query{
   tenants(input: TenantUpdateInput): [Tenant]
   owners(input: OwnerUpdateInput): [Owner]
@@ -132,6 +137,8 @@ type Mutation{
   # the type here is to say if it's an Owner or a Tenant
   # implement this with sessions 
   signIn(input: OwnerCreateInput, type: String): AuthReturn
+
+  addDocumentation(link: String): DocumentResponse
   
 }
 

@@ -97,5 +97,42 @@ describe("Authentication", () => {
     })
   })
 
+  describe("session check", () => {
+    let username
+
+    before(async() => {
+      const o = await Owner.create(randomOwnerPayload())
+      username = o.username
+    })
+
+    it("Should return a session attr in response", async() => {
+      const query = `
+        mutation{
+          login(username: "${username}", password: "12345"){
+            isLogged
+            username
+            sessionUsername
+          }
+        }
+      `
+      const res = await request(app)
+      .post('/graphql')
+      .send({query})
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      
+      expect(res.body.data.login.username).to.equal(username)
+      expect(res.body.data.login.isLogged).to.equal(true)
+      expect(res.body.data.login.sessionUsername).to.equal(username)
+    })
+
+    after(async() => {
+      await Owner.collection.drop()
+    })
+
+  })
+
+
 
 })

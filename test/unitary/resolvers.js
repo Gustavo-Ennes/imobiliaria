@@ -364,7 +364,6 @@ describe("> Resolvers", () => {
       before(async() => {
         const ownerPayload = randomOwnerPayload()
         const owner = await Owner.create(ownerPayload)
-        console.log(`user created : ${JSON.stringify(owner)}`)
         username = owner.username
       })
 
@@ -379,43 +378,6 @@ describe("> Resolvers", () => {
         await Owner.collection.drop()
       })
       
-    })
-
-    describe("session check", () => {
-      let username
-
-      before(async() => {
-        const o = await Owner.create(randomOwnerPayload())
-        username = o.username
-      })
-
-      it("Should return a session attr in response", async() => {
-        const query = `
-          mutation{
-            login(username: "${username}", password: "12345"){
-              isLogged
-              username
-              sessionUsername
-            }
-          }
-        `
-        const res = await request(app)
-        .post('/graphql')
-        .send({query})
-        .set('Accept', 'application/json')
-        .expect('Content-Type', /json/)
-        .expect(200)
-        
-        console.log(res.body.data)
-        expect(res.body.data.login.username).to.equal(username)
-        expect(res.body.data.login.isLogged).to.equal(true)
-        expect(res.body.data.login.sessionUsername).to.equal(username)
-      })
-
-      after(async() => {
-        await Owner.collection.drop()
-      })
-
     })
 
     describe("logout", () => {
@@ -456,6 +418,131 @@ describe("> Resolvers", () => {
 
       after(async() => {
         await Owner.collection.drop()
+      })
+    })
+
+    describe("documentation adder", () => {
+      let tId, oId, lId, pId
+      before(async() => {
+        const tPayload = randomTenantPayload()
+        const tenant = new Tenant(tPayload)
+        const oPayload = randomOwnerPayload()
+        const owner = new Owner(oPayload)
+        const lPayload = randomLandPayload()
+        lPayload.ownerId = owner._id
+        const land = new Land(lPayload)
+        const pPayload = randomPropertyPayload()
+        pPayload.ownerId = owner._id
+        const property = new Property(pPayload)
+
+        tId = tenant._id
+        oId = owner._id
+        lId = land._id
+        pId = property._id
+
+        await tenant.save()
+        await owner.save()
+        await land.save()
+        await property.save()
+      })
+
+      it("Should add documentation to tenant", async() => {
+        const res = await resolvers.addDocumentation(
+          {
+            link: 'https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf',
+            type: 'tenant'
+          },  
+          {
+            session:
+            {
+              id: tId,
+              username: "Kratos"
+            }
+          }
+        )
+        const tenant = await Tenant.findOne({_id: tId})
+        expect(tenant).not.to.be.null
+        expect(res).to.have.property("message")
+        expect(res).to.have.property("result")
+        expect(res.result).to.equal("success")
+        expect(tenant.documents).to.have.lengthOf(1)
+        expect(tenant.documents[0].status).to.equal('pending')
+      })
+
+      it("Should add documentation to a owner", async() => {
+        const res = await resolvers.addDocumentation(
+          {
+            link: 'https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf',
+            type: 'owner'
+          },  
+          {
+            session:
+            {
+              id: oId,
+              username: "Kratos"
+            }
+          }
+        )
+        const owner = await Owner.findOne({_id: oId})
+        expect(owner).not.to.be.null
+        expect(res).to.have.property("message")
+        expect(res).to.have.property("result")
+        expect(res.result).to.equal("success")
+        expect(owner.documents).to.have.lengthOf(1)
+        expect(owner.documents[0].status).to.equal('pending')
+      })
+
+      it("Should add documentation to a land", async() => {
+        const res = await resolvers.addDocumentation(
+          {
+            link: 'https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf',
+            type: 'land'
+          },
+          {
+            session:
+            {
+              id: lId,
+              username: "Kratos"
+            }
+          }
+        )
+        const land = await Land.findOne({_id: lId})
+        expect(land).not.to.be.null
+        expect(res).to.have.property("message")
+        expect(res).to.have.property("result")
+        expect(res.result).to.equal("success")
+        expect(land.documents).to.have.lengthOf(1)
+        expect(land.documents[0].status).to.equal('pending')
+      })
+
+      it("Should add documentation to a property", async() => {
+        const res = await resolvers.addDocumentation(
+          {
+            link: 'https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf',
+            type: 'property'
+          },
+          {
+            session:
+            {
+              id: pId,
+              username: "Kratos"
+            }
+          }
+        )
+        const property = await Property.findOne({_id: pId})
+        expect(property).not.to.be.null
+        expect(res).to.have.property("message")
+        expect(res).to.have.property("result")
+        expect(res.result).to.equal("success")
+        expect(property.documents).to.have.lengthOf(1)
+        expect(property.documents[0].status).to.equal('pending')
+      })
+
+      after(async() => {
+        await Tenant.collection.drop()
+        await Owner.collection.drop()
+        await Land.collection.drop()
+        await Property.collection.drop()
       })
     })
   })

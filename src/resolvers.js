@@ -1,9 +1,9 @@
-const session = require('express-session')
 const { passwordMatch, encrypt } = require('../utils/crypt')
 const Land = require("./models/Land")
 const Owner = require("./models/Owner")
 const Property = require("./models/Property")
 const Tenant = require('./models/Tenant')
+const {isLink, isPdf} = require('../utils/documentation')
 
 const resolvers = {
   lands: async(args, request) => {
@@ -163,6 +163,60 @@ const resolvers = {
   deleteTenant: async (args, request) => {
     await Tenant.deleteOne({_id: args.id})
     return `Tenant id:${args.id} deleted.`
+  },
+
+  // here
+  addDocumentation: async(args, request) => {
+    let response = {}, obj  
+
+    try{
+
+      if(request.session.username){
+
+        switch(args.type){
+          case 'tenant':
+            obj = await Tenant.findOne({_id: request.session.id})
+            break
+          case 'owner':
+            obj = await Owner.findOne({_id: request.session.id})
+            break
+          case 'land':
+            obj = await Land.findOne({_id: request.session.id})
+            break
+          case 'property':
+            obj = await Property.findOne({_id: request.session.id})
+            break
+          default:
+            response.message = "There's no such model in this system"
+            response.result = 'fail'
+            break
+        }
+
+        if(obj){
+          const doc = {
+            link: args.link,
+            status: 'pending',
+            uploadDate: new Date()
+          }
+
+          if(!obj.documents){
+            obj.documents = []
+          }
+          obj.documents.push(doc)
+          await obj.save()
+
+          response.message = `Document ${doc.link} added to ${args.type} ${obj.name || obj._id}`
+          response.result = 'success'
+        }
+        
+      }else{
+        response.message = "Log in first!"
+        response.result = 'fail'
+      }
+      return response
+    }catch(err){
+      console.log(err)
+    }
   },
   login: async(args, request)=> {
     let isLogged = false, 
