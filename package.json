@@ -4,7 +4,7 @@
    "scripts": {
       "dev": "DEV=true nodemon --delay 200ms --trace-warnings server.js",
       "start": "PROD=true node server.js",
-      "test": "TEST=true  mocha --recursive --timeout 5000"
+      "test": "TEST=true  mocha --recursive --timeout 10000"
    },
    "dependencies": {
       "axios": "^0.21.4",
