@@ -12,7 +12,7 @@ describe("> Lands", () =>{
 
   describe(' ~ read', () => {
     // in this I have to create a Owner to the Land because it's required
-    before(async() => {
+    before((done) => {
       try{
         const landPayload = bulk.randomLandPayload()
         const ownerPayload = bulk.randomOwnerPayload()
@@ -56,12 +56,9 @@ describe("> Lands", () =>{
         })
     })
 
-    after((done) => {
-      Land.collection.drop().then(() => {
-        Owner.collection.drop().then( () => {
-          return done()
-        })
-      })
+    after(async() => {
+      await Land.collection.drop()
+      await Owner.collection.drop()
     })
 
   })
