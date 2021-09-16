@@ -36,10 +36,6 @@ const { buildSchema } = require('graphql');
 // Construct a schema, using GraphQL schema language
 const schema = buildSchema(typeDefs)
 
-// const loggingMiddleware = (req, res, next) => {
-//     next()
-// }
-
 /*
   applying middlewares
 */
@@ -47,14 +43,17 @@ app.use(
   cors(), 
   bodyParser.json(), 
   session(sessionOptions)
-  // loggingMiddleware
 )
 
-app.use('/graphql', graphqlHTTP({
-  schema: schema,
-  rootValue: resolvers,
-  graphiql: true
-}))
+app.use('/graphql', graphqlHTTP(request => ({
+    schema,
+    rootValue: resolvers,
+    graphiql: true,
+    context: {
+      request,
+      username: null
+    }
+})))
 
 
 
