@@ -315,65 +315,74 @@ const resolvers = {
       console.log(err)
     }
   },
-  pendingDocumentation: async(args, request) => {
+  pendingDocumentation: async(args, context) => {
     let obj, 
         pendingDocuments = {
         tenants: [],
         owners: [],
         lands: [],
-        properties: []
+        properties: [],
+        total: 0,
+        message: '',
+        status: ''
       }
 
     const getTotal = () => {
-      return pendingDocuments.properties.length+ 
-        pendingDocuments.lands.length+
-        pendingDocuments.owners.length+
-        pendingDocuments.tenants.length
+      return pendingDocuments.properties.length + pendingDocuments.lands.length +pendingDocuments.owners.length + pendingDocuments.tenants.length
     }
 
     try{
-      switch (args.type) {
-        case 'tenant':          
-          obj = await Tenant.findOne({_id: args.id})
-          pendingDocuments.tenants.concat(obj.documents.filter(doc=>doc.status==='pending'))
-          pendingDocuments.message = `${pendingDocuments.tenants.length} tenant(s) document(s) pending`
-          pendingDocuments.status = 'success'
-          break    
-        case 'owner':          
-          obj = await Owner.findOne({_id: args.id})
-          pendingDocuments.owners.concat(obj.documents.filter(doc=>doc.status==='pending'))
-          pendingDocuments.message = `${pendingDocuments.owners.length} owner(s) document(s) pending`
-          pendingDocuments.status = 'success'
-          break   
-        case 'land':          
-          obj = await Land.findOne({_id: args.id})
-          pendingDocuments.lands.concat(obj.documents.filter(doc=>doc.status==='pending'))
-          pendingDocuments.message = `${pendingDocuments.lands.length} land(s) document(s) pending`
-          pendingDocuments.status = 'success'
-          break   
-        case 'property':          
-          obj = await Property.findOne({_id: args.id})
-          pendingDocuments.properties.concat(obj.documents.filter(doc=>doc.status==='pending'))
-          pendingDocuments.message = `${pendingDocuments.properties.length} property(ies) document(s) pending`
-          pendingDocuments.status = 'success'
-          break     
-        default:
+      if(context.username){
+        if(Object.keys(args).length){
+          switch (args.type) {
+            case 'tenant':          
+              obj = await Tenant.findOne({_id: args.id})
+              pendingDocuments.tenants = obj.documents.filter(doc=> doc.status==='pending')
+              pendingDocuments.message = `${pendingDocuments.tenants.length} tenant(s) document(s) pending`
+              pendingDocuments.status = 'success'
+              break    
+            case 'owner':          
+              obj = await Owner.findOne({_id: args.id})
+              pendingDocuments.owners = obj.documents.filter(doc=>doc.status==='pending')
+              pendingDocuments.message = `${pendingDocuments.owners.length} owner(s) document(s) pending`
+              pendingDocuments.status = 'success'
+              break   
+            case 'land':          
+              obj = await Land.findOne({_id: args.id})
+              pendingDocuments.lands = obj.documents.filter(doc=>doc.status==='pending')
+              pendingDocuments.message = `${pendingDocuments.lands.length} land(s) document(s) pending`
+              pendingDocuments.status = 'success'
+              break   
+            case 'property':          
+              obj = await Property.findOne({_id: args.id})
+              pendingDocuments.properties = obj.documents.filter(doc=>doc.status==='pending')
+              pendingDocuments.message = `${pendingDocuments.properties.length} property(ies) document(s) pending`
+              pendingDocuments.status = 'success'
+              break     
+            default:  
+              break
+          }
+        } else{
           const tenants = await Tenant.find()
           const owners = await Owner.find()
           const lands = await Land.find()
           const properties = await Property.find()
           
           tenants.forEach(t => {
-            pendingDocuments.tenants.concat(t.documents.filter(d=>d.status==='pending'))
+            const docs = t.documents.filter(d=>d.status==='pending')
+            pendingDocuments.tenants = pendingDocuments.tenants.concat(docs)
           })
           owners.forEach(o => {
-            pendingDocuments.owners.concat(o.documents.filter(d=>d.status==='pending'))
+            const docs = o.documents.filter(d=>d.status==='pending')
+            pendingDocuments.owners = pendingDocuments.owners.concat(docs)
           })
           lands.forEach(l => {
-            pendingDocuments.owners.concat(l.documents.filter(d=>d.status==='pending'))
+            const docs = l.documents.filter(d=>d.status==='pending')
+            pendingDocuments.lands = pendingDocuments.lands.concat(docs)
           })
           properties.forEach(p => {
-            pendingDocuments.properties.concat(p.documents.filter(d=>d.status==='pending'))
+            const docs = p.documents.filter(d=>d.status==='pending')
+            pendingDocuments.properties = pendingDocuments.properties.concat(docs)
           })
 
           pendingDocuments.message = `
@@ -388,10 +397,15 @@ const resolvers = {
           } total`
 
           pendingDocuments.status = 'success'
+        }
+
+        pendingDocuments.total = getTotal()
+        console.log(pendingDocuments)
+      } else{
+        pendingDocuments.message = `Login first!`
+        pendingDocuments.status = 'fail'
       }
-
-      pendingDocuments.total = getTotal()
-
+      
       return pendingDocuments
 
     }catch(err){

@@ -368,10 +368,10 @@ describe("> Resolvers", () => {
       })
 
       it("Should log in", async() => {
-        const res = await resolvers.login({username, password}, {})
-        console.log(res.message)
+        const res = await resolvers.login({username, password}, {request: {session: {}}})
         expect(res.isLogged).to.equal(true)
         expect(res.username).to.equal(username)
+        expect(res.sessionUsername).to.equal(username)
       })
 
       after(async () => {
@@ -422,18 +422,18 @@ describe("> Resolvers", () => {
     })
 
     describe("documentation adder", () => {
-      let tId, oId, lId, pId
+      let tId, oId, lId, pId, tenant, owner, property, land
       before(async() => {
         const tPayload = randomTenantPayload()
-        const tenant = new Tenant(tPayload)
+        tenant = new Tenant(tPayload)
         const oPayload = randomOwnerPayload()
-        const owner = new Owner(oPayload)
+        owner = new Owner(oPayload)
         const lPayload = randomLandPayload()
         lPayload.ownerId = owner._id
-        const land = new Land(lPayload)
+        land = new Land(lPayload)
         const pPayload = randomPropertyPayload()
         pPayload.ownerId = owner._id
-        const property = new Property(pPayload)
+        property = new Property(pPayload)
 
         tId = tenant._id
         oId = owner._id
@@ -450,17 +450,14 @@ describe("> Resolvers", () => {
         const res = await resolvers.addDocumentation(
           {
             link: 'https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf',
-            type: 'tenant'
+            type: 'tenant',
+            id: tenant._id
           },  
           {
-            session:
-            {
-              id: tId,
-              username: "Kratos"
-            }
+            username: tenant.username
           }
         )
-        const tenant = await Tenant.findOne({_id: tId})
+        tenant = await Tenant.findOne({_id: tId})
         expect(tenant).not.to.be.null
         expect(res).to.have.property("message")
         expect(res).to.have.property("result")
@@ -473,17 +470,14 @@ describe("> Resolvers", () => {
         const res = await resolvers.addDocumentation(
           {
             link: 'https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf',
-            type: 'owner'
+            type: 'owner',
+            id: owner._id
           },  
           {
-            session:
-            {
-              id: oId,
-              username: "Kratos"
-            }
+            username: owner.username
           }
         )
-        const owner = await Owner.findOne({_id: oId})
+        owner = await Owner.findOne({_id: oId})
         expect(owner).not.to.be.null
         expect(res).to.have.property("message")
         expect(res).to.have.property("result")
@@ -496,17 +490,14 @@ describe("> Resolvers", () => {
         const res = await resolvers.addDocumentation(
           {
             link: 'https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf',
-            type: 'land'
+            type: 'land',
+            id: land._id
           },
           {
-            session:
-            {
-              id: lId,
-              username: "Kratos"
-            }
+            username: owner.username
           }
         )
-        const land = await Land.findOne({_id: lId})
+        land = await Land.findOne({_id: lId})
         expect(land).not.to.be.null
         expect(res).to.have.property("message")
         expect(res).to.have.property("result")
@@ -519,17 +510,14 @@ describe("> Resolvers", () => {
         const res = await resolvers.addDocumentation(
           {
             link: 'https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf',
-            type: 'property'
+            type: 'property',
+            id: property._id
           },
           {
-            session:
-            {
-              id: pId,
-              username: "Kratos"
-            }
+            username: owner.username
           }
         )
-        const property = await Property.findOne({_id: pId})
+        property = await Property.findOne({_id: pId})
         expect(property).not.to.be.null
         expect(res).to.have.property("message")
         expect(res).to.have.property("result")
@@ -548,7 +536,7 @@ describe("> Resolvers", () => {
   })
 
   describe("get pending documents", () => {
-    let tId, oId, lId, pId, 
+    let tId, oId, lId, pId, tenant, owner, property, land,
       tCounter = parseInt(1 + Math.random() * 4),
       lCounter = parseInt(1 + Math.random() * 4),
       oCounter = parseInt(1 + Math.random() * 4),
@@ -557,15 +545,15 @@ describe("> Resolvers", () => {
     before(async() => {
       //create one model of each
       const tPayload = randomTenantPayload()
-      const tenant = new Tenant(tPayload)
+      tenant = new Tenant(tPayload)
       const oPayload = randomOwnerPayload()
-      const owner = new Owner(oPayload)
+      owner = new Owner(oPayload)
       const lPayload = randomLandPayload()
       lPayload.ownerId = owner._id
-      const land = new Land(lPayload)
+      land = new Land(lPayload)
       const pPayload = randomPropertyPayload()
       pPayload.ownerId = owner._id
-      const property = new Property(pPayload)
+      property = new Property(pPayload)
 
       tId = tenant._id
       oId = owner._id
@@ -584,14 +572,11 @@ describe("> Resolvers", () => {
         await resolvers.addDocumentation(
           {
             link: 'https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf',
-            type: 'tenant'
+            type: 'tenant',
+            id: tenant._id
           },  
           {
-            session:
-            {
-              id: tId,
-              username: "Kratos"
-            }
+            username: tenant.username
           }
         )
       }
@@ -600,14 +585,11 @@ describe("> Resolvers", () => {
         await resolvers.addDocumentation(
           {
             link: 'https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf',
-            type: 'owner'
+            type: 'owner',
+            id: owner._id
           },  
           {
-            session:
-            {
-              id: oId,
-              username: "Kratos"
-            }
+            username: tenant.username
           }
         )
       }
@@ -616,14 +598,11 @@ describe("> Resolvers", () => {
         await resolvers.addDocumentation(
           {
             link: 'https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf',
-            type: 'land'
+            type: 'land',
+            id: land._id
           },  
           {
-            session:
-            {
-              id: lId,
-              username: "Kratos"
-            }
+            username: tenant.username
           }
         )
       }
@@ -632,34 +611,35 @@ describe("> Resolvers", () => {
         await resolvers.addDocumentation(
           {
             link: 'https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf',
-            type: 'property'
+            type: 'property',
+            id: property._id
           },  
           {
-            session:
-            {
-              id: pId,
-              username: "Kratos"
-            }
+            username: tenant.username
           }
         )
       }
     })
 
     it(`tenants should count ${tCounter} documents pending`, async() => {
-      const tenant = await Tenant.findOne({_id: tId})
-      expect(tenant.documents).to.have.lengthOf(tCounter)
+      const res = await resolvers.pendingDocumentation({id:tenant._id, type: 'tenant'}, {username: 'kratos'})
+      expect(res.tenants).to.have.lengthOf(tCounter)
     })
     it(`owners should count ${oCounter} documents pending`, async() => {
-      const owner = await Owner.findOne({_id: oId})
-      expect(owner.documents).to.have.lengthOf(oCounter)
+      const res = await resolvers.pendingDocumentation({id:owner._id, type: 'owner'}, {username: 'kratos'})
+      expect(res.owners).to.have.lengthOf(oCounter)
     })
     it(`lands should count ${lCounter} documents pending`, async() => {
-      const land = await Land.findOne({_id: lId})
-      expect(land.documents).to.have.lengthOf(lCounter)
+      const res = await resolvers.pendingDocumentation({id:land._id, type: 'land'}, {username: 'kratos'})
+      expect(res.lands).to.have.lengthOf(lCounter)
     })
     it(`properties should count ${tCounter} documents pending`, async() => {
-      const property = await Property.findOne({_id: pId})
-      expect(property.documents).to.have.lengthOf(pCounter)
+      const res = await resolvers.pendingDocumentation({id:property._id, type: 'property'}, {username: 'kratos'})
+      expect(res.properties).to.have.lengthOf(pCounter)
+    })
+    it(`total should count ${tCounter + oCounter + lCounter + pCounter} documents pending`, async() => {
+      const res = await resolvers.pendingDocumentation({}, {username: 'kratos'})
+      expect(res.total).to.equal(tCounter + oCounter + lCounter + pCounter)
     })
   })
 

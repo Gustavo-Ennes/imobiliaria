@@ -149,7 +149,7 @@ type Mutation{
   signIn(input: OwnerCreateInput!, type: String!): AuthReturn
 
   addDocumentation(link: String!, type:String!, id: ID!): AddDocumentResponse
-  pendingDocumentation(type: String, id: ID): PendingDocumentResponse
+  pendingDocumentation(id: ID, type: String): PendingDocumentResponse
   
 }
 
