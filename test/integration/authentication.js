@@ -314,7 +314,7 @@ describe("Authentication", () => {
     })
 
 
-    describe.skip("session", () => {
+    describe("session", () => {
       let username
       before(async() => {
         const payload = randomTenantPayload()
@@ -337,8 +337,12 @@ describe("Authentication", () => {
           .expect('Content-Type', /json/)
           .expect(200)
         
-        console.log(res.body.data)
+        expect(res.body.data.login.sessionUsername).to.equal(username)
           
+      })
+
+      after(async() => {
+        await Tenant.collection.drop()
       })
     })
 
