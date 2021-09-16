@@ -164,53 +164,54 @@ const resolvers = {
     await Tenant.deleteOne({_id: args.id})
     return `Tenant id:${args.id} deleted.`
   },
-  login: async(args, request)=> {
-    let isLogged = false, 
-      sessionRestored = false, 
-      username = null,
-      message = null,
-      sessionUsername = null
-    const password = '12345'
+  login: async(args, context)=> {
 
     try{
 
-      if(request.session && request.session.userID){
+      let request = context.request, 
+        username = context.username,
+        isLogged = false, 
+        sessionRestored = false, 
+        message = null,
+        sessionUsername = null
+
+      if(request.session && context.username){
+
         isLogged =  true
-        username = res.username
         sessionRestored = true
+        message = `Welcome back, ${context.username}!`
+        sessionUsername = context.username
 
       } else{
         let user = await Tenant.findOne({username: args.username})
+
         if(!user){
           user = await Owner.findOne({username: args.username})
+        }
 
-          if(user){
-            const isPasswordCorrect = await passwordMatch(password, user.password)
-            if(isPasswordCorrect){
+        if(user){
+          const isPasswordCorrect = await passwordMatch(args.password, user.password)
 
-              username = user.username
-              if(request.session){
-                request.session.username = user.username
-              }
-              isLogged = true
-              message = `Hello, ${username}!`
-            }
-          } else{
-            message = `User '${args.username}' not found.`
+          if(isPasswordCorrect){
+
+            context.username = user.username
+            message = `Hello, ${context.username}!`
+            sessionUsername = context.username
+            username = context.username
+            isLogged =  true
+            sessionRestored = false
+
           }
-        } else {
-          isLogged = true
-          username = user.username
-          message = `Hello, ${username}!`
+        } else{
+          message = `User '${args.username}' not found.`
         }
       }
+  
+      return {isLogged, username, sessionRestored, message, sessionUsername}
+
     }catch(err){
       console.log(err)
-    }
-    if(request.session){
-      sessionUsername = request.session.username
-    }
-    return {isLogged, username, sessionRestored, message, sessionUsername}
+    }    
   },
   logout: (args, request) => {
     if(request.session){
@@ -257,25 +258,25 @@ const resolvers = {
       username
     }
   },
-  addDocumentation: async(args, request) => {
-    let response = {}, obj  
-
+  addDocumentation: async(args, context) => {
+    let response = {}, obj
     try{
 
-      if(request.session.username){
-
+      if(context.username){
+        
+        
         switch(args.type){
           case 'tenant':
-            obj = await Tenant.findOne({_id: request.session.id})
+            obj = await Tenant.findOne({_id: args.id})
             break
           case 'owner':
-            obj = await Owner.findOne({_id: request.session.id})
+            obj = await Owner.findOne({_id: args.id})
             break
           case 'land':
-            obj = await Land.findOne({_id: request.session.id})
+            obj = await Land.findOne({_id: args.id})
             break
           case 'property':
-            obj = await Property.findOne({_id: request.session.id})
+            obj = await Property.findOne({_id: args.id})
             break
           default:
             response.message = "There's no such model in this system"
@@ -298,13 +299,18 @@ const resolvers = {
 
           response.message = `Document ${doc.link} added to ${args.type} ${obj.name || obj._id}`
           response.result = 'success'
+        } else{
+          response.message = `There's no ${args.type} with ID ${args.id}`
+          response.result = 'fail'
         }
         
       }else{
         response.message = "Log in first!"
         response.result = 'fail'
       }
+
       return response
+
     }catch(err){
       console.log(err)
     }

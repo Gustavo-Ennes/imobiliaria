@@ -142,13 +142,13 @@ type Mutation{
   updateTenant(id: ID!, input:TenantUpdateInput): Tenant
   deleteTenant(id: ID!): String
 
-  login(username: String, password: String): AuthReturn
+  login(username: String!, password: String!): AuthReturn
   logout(username: String): AuthReturn
   # the type here is to say if it's an Owner or a Tenant
   # implement this with sessions 
-  signIn(input: OwnerCreateInput, type: String): AuthReturn
+  signIn(input: OwnerCreateInput!, type: String!): AuthReturn
 
-  addDocumentation(link: String): AddDocumentResponse
+  addDocumentation(link: String!, type:String!, id: ID!): AddDocumentResponse
   pendingDocumentation(type: String, id: ID): PendingDocumentResponse
   
 }
