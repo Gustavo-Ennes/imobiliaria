@@ -98,9 +98,19 @@ type AuthReturn{
   sessionUsername: String
 }
 
-type DocumentResponse{
+type AddDocumentResponse{
   message: String
   result: String
+}
+
+type PendingDocumentResponse{
+  tenants: [Tenant]
+  owners: [Owner]
+  lands: [Land]
+  properties: [Property]
+  total: Int
+  status: String
+  message: String
 }
 
 type Query{
@@ -138,7 +148,8 @@ type Mutation{
   # implement this with sessions 
   signIn(input: OwnerCreateInput, type: String): AuthReturn
 
-  addDocumentation(link: String): DocumentResponse
+  addDocumentation(link: String): AddDocumentResponse
+  pendingDocumentation(type: String, id: ID): PendingDocumentResponse
   
 }
 

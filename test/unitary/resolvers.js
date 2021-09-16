@@ -546,4 +546,128 @@ describe("> Resolvers", () => {
       })
     })
   })
+
+  describe("get pending documents", () => {
+    let tId, oId, lId, pId, 
+      tCounter = parseInt(1 + Math.random() * 4),
+      lCounter = parseInt(1 + Math.random() * 4),
+      oCounter = parseInt(1 + Math.random() * 4),
+      pCounter = parseInt(1 + Math.random() * 4)
+
+    before(async() => {
+      //create one model of each
+      const tPayload = randomTenantPayload()
+      const tenant = new Tenant(tPayload)
+      const oPayload = randomOwnerPayload()
+      const owner = new Owner(oPayload)
+      const lPayload = randomLandPayload()
+      lPayload.ownerId = owner._id
+      const land = new Land(lPayload)
+      const pPayload = randomPropertyPayload()
+      pPayload.ownerId = owner._id
+      const property = new Property(pPayload)
+
+      tId = tenant._id
+      oId = owner._id
+      lId = land._id
+      pId = property._id
+
+      await tenant.save()
+      await owner.save()
+      await land.save()
+      await property.save()
+
+
+      // add random number of documents in each
+      // tenant
+      for(let i = 0; i < tCounter; i++){
+        await resolvers.addDocumentation(
+          {
+            link: 'https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf',
+            type: 'tenant'
+          },  
+          {
+            session:
+            {
+              id: tId,
+              username: "Kratos"
+            }
+          }
+        )
+      }
+      // owner 
+      for(let i = 0; i < oCounter; i++){
+        await resolvers.addDocumentation(
+          {
+            link: 'https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf',
+            type: 'owner'
+          },  
+          {
+            session:
+            {
+              id: oId,
+              username: "Kratos"
+            }
+          }
+        )
+      }
+      // land
+      for(let i = 0; i < lCounter; i++){
+        await resolvers.addDocumentation(
+          {
+            link: 'https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf',
+            type: 'land'
+          },  
+          {
+            session:
+            {
+              id: lId,
+              username: "Kratos"
+            }
+          }
+        )
+      }
+      // properties
+      for(let i = 0; i < pCounter; i++){
+        await resolvers.addDocumentation(
+          {
+            link: 'https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf',
+            type: 'property'
+          },  
+          {
+            session:
+            {
+              id: pId,
+              username: "Kratos"
+            }
+          }
+        )
+      }
+    })
+
+    it(`tenants should count ${tCounter} documents pending`, async() => {
+      const tenant = await Tenant.findOne({_id: tId})
+      expect(tenant.documents).to.have.lengthOf(tCounter)
+    })
+    it(`owners should count ${oCounter} documents pending`, async() => {
+      const owner = await Owner.findOne({_id: oId})
+      expect(owner.documents).to.have.lengthOf(oCounter)
+    })
+    it(`lands should count ${lCounter} documents pending`, async() => {
+      const land = await Land.findOne({_id: lId})
+      expect(land.documents).to.have.lengthOf(lCounter)
+    })
+    it(`properties should count ${tCounter} documents pending`, async() => {
+      const property = await Property.findOne({_id: pId})
+      expect(property.documents).to.have.lengthOf(pCounter)
+    })
+  })
+
+
+  after(async() => {
+    await Tenant.collection.drop()
+    await Owner.collection.drop()
+    await Land.collection.drop()
+    await Property.collection.drop()
+  })
 })
