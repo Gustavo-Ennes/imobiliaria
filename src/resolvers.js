@@ -3,7 +3,7 @@ const Land = require("./models/Land")
 const Owner = require("./models/Owner")
 const Property = require("./models/Property")
 const Tenant = require('./models/Tenant')
-const { checkOwner, checkAdmin, checkTenantByUsername, checkAdminByUsername, checkOwnerByUsername } = require('../utils/validation')
+const { checkOwnership, checkOwner, checkAdmin, checkTenantByUsername, checkAdminByUsername, checkOwnerByUsername } = require('../utils/validation')
 const Admin = require('./models/Admin')
 
 
@@ -71,19 +71,28 @@ const resolvers = {
       console.log(err)
     }
   },
-  updateLand: async(args, request) => {
+  updateLand: async(args, context) => {
     try{
-      const land = await Land.findOne({_id: args.id})
-      await Land.updateOne({_id: args.id}, {$set: args.input})
-      return args.input
+      const isOwner = await checkOwnership(context.username, 'land', args.id)
+      if(isOwner){
+        await Land.updateOne({_id: args.id}, {$set: args.input})
+        const land = await Land.findOne({_id: args.id})
+        return land
+      }
+      return null
     }catch(err){
       console.log(err)
     }
   },
-  deleteLand: async(args, request) => {
+  deleteLand: async(args, context) => {
     try{
-      await Land.deleteOne({_id: args.id})
-      return `Land id:${args.id} deleted.`
+      const isOwner = await checkOwnership(context.username, 'land', args.id)
+      
+      if(isOwner){
+        await Land.deleteOne({_id: args.id})
+        return `Land id:${args.id} deleted.`
+      } 
+      return 'fail'
     }catch(err){
       console.log(err)
     }

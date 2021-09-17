@@ -5,6 +5,7 @@ const app = require('../../app')
 const request = require('supertest')
 const chai = require('chai')
 const expect = chai.expect
+const {randomOwnerPayload} = require('../../utils/bulk')
 
 
 describe("> Lands", () =>{
@@ -120,14 +121,14 @@ describe("> Lands", () =>{
   })
 
   describe(" ~ update", () => {
-    let id
+    let id, realOwner
     before((done) => {
       const ownerPayload = bulk.randomOwnerPayload()
       const landPayload = bulk.randomLandPayload()
 
       Owner.create(ownerPayload).then((owner) => {
-
-        id = owner.id
+        realOwner = owner
+        id = owner._id
         landPayload.ownerId = id
         Land.create(landPayload).then((land) => {
           id = land._id
@@ -136,10 +137,45 @@ describe("> Lands", () =>{
       })
     })
 
+    it("Should not update a land that dont belog to an Owner", async() => {
+      const fakeOwner = await Owner.create(bulk.randomOwnerPayload())
+      const query = `
+        mutation{
+          login(username: "${fakeOwner.username}", password:"12345"){
+            isLogged
+          }
+          updateLand(
+            id: "${id}",
+            input: {
+              size: 666
+            }
+          ){
+            size
+          }
+        }
+      `
+
+      const res = await request(app)
+        .post('/graphql')
+        .send({query})
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+
+      expect(res.body.data.login.isLogged).to.be.true
+      expect(res.body.data).to.have.property("updateLand")
+      expect(res.body.data.updateLand).to.be.null
+      
+
+    })
+
     it("Should update an existing land", (done) => {
 
       const query = `
         mutation{
+          login(username: "${realOwner.username}", password: "12345"){
+            isLogged
+          }
           updateLand(
             id: "${id}",
             input: {
@@ -160,6 +196,7 @@ describe("> Lands", () =>{
       .end(function(err, res) {
         if(err){done(err)}
         else {
+          expect(res.body.data.login.isLogged).to.be.true
           expect(res.body.data).to.have.property("updateLand")
           expect(res.body.data.updateLand).to.have.property("size")
           expect(res.body.data.updateLand.size).to.equal(666)
@@ -178,38 +215,67 @@ describe("> Lands", () =>{
   })
 
   describe(" ~ delete", () => {
-    let id
+    let id, username
     before(( done ) => {
       const landPayload = bulk.randomLandPayload()
 
       Owner.create(bulk.randomOwnerPayload()).then((owner) => {
         id = owner._id
+        username = owner.username
         landPayload.ownerId = id
-        Land.create( landPayload ).then(() => {
+        Land.create( landPayload ).then((land) => {
+          id = land._id
           done()
         })
       })
     })
 
+    it("Should not delete a land if user isn't it's owner", async() => {
+      const fakeOwner = await Owner.create(randomOwnerPayload())
+      const query = `
+        mutation{
+          login(username:"${fakeOwner.username}", password: "12345"){
+            isLogged
+          }
+          deleteLand(id: "${id}")
+        }
+      `
+      const res = await request(app)
+        .post('/graphql')
+        .send({query})
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+
+      expect(res.body.data.deleteLand).to.be.a("string")
+      expect(res.body.data.deleteLand).to.be.equal('fail')
+
+
+    })
+
     it("Should delete a land", ( done ) => {
       const query = `
         mutation{
+          login(username: "${username}", password: "12345"){
+            isLogged
+          }
           deleteLand(id: "${id}")
         }
       `
       request(app)
-      .post('/graphql')
-      .send({query})
-      .set('Accept', 'application/json')
-      .expect('Content-Type', /json/)
-      .expect(200)
-      .end((err, res) => {
-        if(err){done(err)}
-        else{
-          expect(res.body.data.deleteLand).to.be.a('string')
-          done()
-        }
-      })
+        .post('/graphql')
+        .send({query})
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .end((err, res) => {
+          if(err){done(err)}
+          else{
+            expect(res.body.data.deleteLand).to.be.a('string')
+            expect(res.body.data.deleteLand).not.to.equal('fail')
+            done()
+          }
+        })
       
     })
   })
