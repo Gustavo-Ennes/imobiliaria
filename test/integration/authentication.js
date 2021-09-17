@@ -92,7 +92,6 @@ describe("Authentication", () => {
           .expect(200)
           .catch((err)=>console.log(err))  
           
-        console.log(JSON.stringify(res.body.data))
         
         if(res.body.data.login.sessionRestored){
           console.log(" ~ login from sessionID ~ ")

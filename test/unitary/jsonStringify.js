@@ -13,7 +13,7 @@ describe(" ~ jsonStringify", () => {
       "favPlayers": {"one": "Kante", "two": "Hazard", "three": "Didier"}
     }
     const stringifiedJson = stringify(json)
-    console.log(stringifiedJson)
+    
     expect(stringifiedJson.indexOf('"key1"')).to.equal(-1)
     expect(stringifiedJson.indexOf('key1')).to.not.equal(-1)
     expect(stringifiedJson.indexOf('"favPlayers"')).to.equal(-1)

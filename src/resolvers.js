@@ -400,7 +400,6 @@ const resolvers = {
         }
 
         pendingDocuments.total = getTotal()
-        console.log(pendingDocuments)
       } else{
         pendingDocuments.message = `Login first!`
         pendingDocuments.status = 'fail'

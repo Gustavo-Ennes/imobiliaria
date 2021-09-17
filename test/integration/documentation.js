@@ -298,8 +298,6 @@ describe(" ~ Documentation", () => {
           .expect('Content-Type', /json/)
           .expect(200)
 
-        console.log(res.body.data)
-
         expect(res.body.data.login.isLogged).to.be.true
         expect(res.body.data.pendingDocumentation.lands).to.have.lengthOf(1)
         expect(res.body.data.pendingDocumentation.total).to.equal(1)
@@ -329,7 +327,6 @@ describe(" ~ Documentation", () => {
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
           .expect(200)
-
 
         expect(res.body.data.login.isLogged).to.be.true
         expect(res.body.data.pendingDocumentation.properties).to.have.lengthOf(1)
