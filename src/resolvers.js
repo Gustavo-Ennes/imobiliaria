@@ -3,7 +3,9 @@ const Land = require("./models/Land")
 const Owner = require("./models/Owner")
 const Property = require("./models/Property")
 const Tenant = require('./models/Tenant')
-const {isLink, isPdf} = require('../utils/documentation')
+const { checkOwner, checkAdmin } = require('../utils/validation')
+
+let isOwner, isAdmin
 
 const resolvers = {
   lands: async(args, request) => {
@@ -19,7 +21,13 @@ const resolvers = {
   },  
   createLand: async(args, request) => {
     try{
-      const land = await Land.create(args.input)
+      let land = null
+      isOwner = await checkOwner(args.input.ownerId)
+      isAdmin = await checkAdmin(args.input.ownerId)
+      
+      if(isOwner || isAdmin){
+        land = await Land.create(args.input)
+      }
       return land
     }catch(err){
       console.log(err)

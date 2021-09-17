@@ -130,6 +130,16 @@ describe("> Resolvers", () => {
 
   // CREATION
   describe(" ~ land create", () => {
+
+    it("Should not allow a Tenant to create a land", async() => {
+      const t = await Tenant.create(randomTenantPayload())
+      const lPayload = randomLandPayload()
+      lPayload.ownerId = t._id
+
+      const res = await resolvers.createLand({input: lPayload}, {})
+      expect(res).to.be.null
+    })
+
     it("Should return the created mongoose model", async() => {
       const o = await Owner.create(randomOwnerPayload())
       const lPayload = randomLandPayload()

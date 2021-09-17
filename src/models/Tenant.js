@@ -2,10 +2,6 @@ const Mongoose = require("../database/db")
 const DocumentSchema = require('./schemas/DocumentSchema')
 const TenantMetaSchema = require('./schemas/TenantMetaSchema')
 
-
-
-
-
 module.exports =  new Mongoose.model(
   "Tenant",
   new Mongoose.Schema({
@@ -23,6 +19,6 @@ module.exports =  new Mongoose.model(
     address_district: {type: String, required: true},
     address_city: {type: String, required: true},
     address_zip: {type: String, required: true},
-    meta: {type: Meta}
+    meta: TenantMetaSchema
   }, {timestamps: true})
 )
