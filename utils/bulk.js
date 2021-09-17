@@ -203,5 +203,6 @@ module.exports = {
   randomOwnerPayload,
   randomPropertyPayload,
   randomLandPayload,
-  simplePassword
+  randomAdminPayload,
+  simplePassword,
 }
