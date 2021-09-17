@@ -240,6 +240,10 @@ const resolvers = {
           user = await Owner.findOne({username: args.username})
         }
 
+        if(!user){
+          user = await Admin.findOne({username: args.username})
+        }
+
         if(user){
           const isPasswordCorrect = await passwordMatch(args.password, user.password)
 

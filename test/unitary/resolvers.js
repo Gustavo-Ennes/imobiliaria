@@ -6,6 +6,7 @@ const Owner = require("../../src/models/Owner")
 const Land = require("../../src/models/Land")
 const Property = require("../../src/models/Property")
 const Tenant = require('../../src/models/Tenant')
+const Admin = require('../../src/models/Admin')
 const request = require('supertest')
 const app = require('../../app')
 const JSONGraphqlStringify = require('../../utils/jsonStringify')
@@ -387,16 +388,26 @@ describe("> Resolvers", () => {
     })
 
     describe("login", () => {
-      let username
+      let username, admin
       const password = '12345'
 
       before(async() => {
         const ownerPayload = randomOwnerPayload()
         const owner = await Owner.create(ownerPayload)
+        const adminPayload = randomAdminPayload()
+        admin = await Admin.create(adminPayload)
         username = owner.username
       })
 
       it("Should log in", async() => {
+        const res = await resolvers.login({username, password}, {request: {session: {}}})
+        expect(res.isLogged).to.equal(true)
+        expect(res.username).to.equal(username)
+        expect(res.sessionUsername).to.equal(username)
+      })
+
+      it("Should login a admin user", async() => {
+        username = admin.username
         const res = await resolvers.login({username, password}, {request: {session: {}}})
         expect(res.isLogged).to.equal(true)
         expect(res.username).to.equal(username)
@@ -410,10 +421,11 @@ describe("> Resolvers", () => {
     })
 
     describe("logout", () => {
-      let username
+      let username, admin
 
       before(async() => {
         const o = await Owner.create(randomOwnerPayload())
+        admin = await Admin.create(randomAdminPayload())
         username = o.username
       })
 
@@ -443,6 +455,34 @@ describe("> Resolvers", () => {
         expect(res.body.data.logout.isLogged).to.equals(false)
         expect(res.body.data.logout.sessionUsername).to.equals(null)
 
+      })
+
+      it('Should logout an Admin user', async() => {
+        username = admin.username
+        const query = `
+          mutation{
+            login(username: "${username}", password: "12345"){
+              isLogged
+              username
+              sessionUsername
+            }
+            logout(username: "${username}"){
+              isLogged
+              sessionUsername
+            }
+          }
+        `
+        const res = await request(app)
+        .post('/graphql')
+        .send({query})
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+
+        expect(res.body.data.logout).to.have.property("isLogged")
+        expect(res.body.data.logout).to.have.property("sessionUsername")
+        expect(res.body.data.logout.isLogged).to.equals(false)
+        expect(res.body.data.logout.sessionUsername).to.equals(null)
       })
 
       after(async() => {
