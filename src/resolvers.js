@@ -3,8 +3,9 @@ const Land = require("./models/Land")
 const Owner = require("./models/Owner")
 const Property = require("./models/Property")
 const Tenant = require('./models/Tenant')
-const { checkOwner, checkAdmin } = require('../utils/validation')
+const { checkOwner, checkAdmin, checkTenantByUsername, checkAdminByUsername, checkOwnerByUsername } = require('../utils/validation')
 const Admin = require('./models/Admin')
+
 
 let isOwner, isAdmin
 
@@ -316,24 +317,35 @@ const resolvers = {
     }
   },
   addDocumentation: async(args, context) => {
-    let response = {}, obj
+    let response = {}, obj = null
     try{
+      const isUserATenant = await checkTenantByUsername(context.username)
+      const isUserAAdmin = await checkAdminByUsername(context.username)
+      const isUserAOwner = await checkOwnerByUsername(context.username)
 
       if(context.username){
         
         
         switch(args.type){
           case 'tenant':
-            obj = await Tenant.findOne({_id: args.id})
+            if(isUserATenant || isUserAAdmin){
+              obj = await Tenant.findOne({_id: args.id})
+            }
             break
           case 'owner':
-            obj = await Owner.findOne({_id: args.id})
+            if(isUserAOwner || isUserAAdmin){
+              obj = await Owner.findOne({_id: args.id})
+            }
             break
           case 'land':
-            obj = await Land.findOne({_id: args.id})
+            if(isUserAOwner || isUserAAdmin){
+              obj = await Land.findOne({_id: args.id})
+            }
             break
           case 'property':
-            obj = await Property.findOne({_id: args.id})
+            if(isUserAOwner || isUserAAdmin){
+              obj = await Property.findOne({_id: args.id})
+            }
             break
           default:
             response.message = "There's no such model in this system"
@@ -357,12 +369,12 @@ const resolvers = {
           response.message = `Document ${doc.link} added to ${args.type} ${obj.name || obj._id}`
           response.result = 'success'
         } else{
-          response.message = `There's no ${args.type} with ID ${args.id}`
+          response.message = `Wrong type or unauthorized`
           response.result = 'fail'
         }
         
       }else{
-        response.message = "Log in first!"
+        response.message = "The user must be a tenant or a admin!"
         response.result = 'fail'
       }
 
