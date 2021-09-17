@@ -1,5 +1,19 @@
 module.exports = `
 
+input AdminCreateInput{
+  name: String!
+  phone: String!
+  username: String!
+  password: String!
+}
+
+input AdminUpdateInput{
+  name: String
+  phone: String
+  username: String
+  password: String
+}
+
 input TenantCreateInput{
   name: String!,
   phone: String!,

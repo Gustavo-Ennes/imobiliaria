@@ -89,6 +89,13 @@ type Property{
   likes: Int
 }
 
+type Admin{
+  name: String
+  phone: String
+  username: String
+  password: String
+}
+
 type AuthReturn{
   isSigned: Boolean
   isLogged: Boolean
@@ -114,10 +121,12 @@ type PendingDocumentResponse{
 }
 
 type Query{
+  admins(input: AdminUpdateInput): [Admin]
   tenants(input: TenantUpdateInput): [Tenant]
   owners(input: OwnerUpdateInput): [Owner]
   properties(input: PropertyUpdateInput): [Property]
   lands(input: LandUpdateInput): [Land]
+  adminById(id: ID!): Admin
   tenantById(id: ID!): Tenant
   ownerById(id: ID!): Owner
   propertyById(id: ID!): Property   
@@ -125,6 +134,10 @@ type Query{
 }
 
 type Mutation{
+
+  createAdmin(input: AdminCreateInput): Admin
+  updateAdmin(id: ID!, input: AdminUpdateInput): Admin
+  deleteAdmin(id: ID!): String
 
   createProperty(input: PropertyCreateInput): Property
   updateProperty(id:ID!, input: PropertyUpdateInput): Property
