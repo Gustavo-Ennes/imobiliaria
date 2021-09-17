@@ -10,7 +10,18 @@ module.exports = {
     const a = await Admin.findOne({_id: adminId})
     return (a instanceof Admin)
   },
-  checkAdminBySession: async() => {
-    
+  checkTenantByUsername: async(username) => {
+    if(username instanceof String){
+      const t = await Tenant.findOne({username})
+      return (t instanceof Tenant)
+    }
+    return false
+  },
+  checkAdminByUsername: async(username) => {
+    if(username instanceof String){
+      const a = await Admin.findOne({username})
+      return (a instanceof Admin)
+    }
+    return false
   }
 }
