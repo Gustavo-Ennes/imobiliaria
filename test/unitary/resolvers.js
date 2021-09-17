@@ -384,6 +384,7 @@ describe("> Resolvers", () => {
 
       after(async() => {
         await Owner.collection.drop()
+        await Admin.collection.drop()
       })
     })
 
@@ -416,6 +417,7 @@ describe("> Resolvers", () => {
 
       after(async () => {
         await Owner.collection.drop()
+        await Admin.collection.drop()
       })
       
     })
@@ -487,6 +489,7 @@ describe("> Resolvers", () => {
 
       after(async() => {
         await Owner.collection.drop()
+        await Admin.collection.drop()
       })
     })
 

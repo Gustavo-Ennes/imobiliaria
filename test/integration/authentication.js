@@ -9,12 +9,48 @@ const bulk = require('../../utils/bulk')
 const chai = require('chai')
 const expect = chai.expect
 const {randomOwnerPayload, randomTenantPayload, randomPropertyPayload, randomLandPayload} = require('../../utils/bulk')
+const Admin = require("../../src/models/Admin")
 
 describe("Authentication", () => {
 
   try{
 
     describe("Sign In", () => {
+      it("Should add a user of type Admin", async()=> {
+        const query = `
+          mutation{
+            signIn(
+              type: "admin",
+              input:{
+                name: "Gustavo Ennes",
+                password: "${simplePassword}"
+                phone: "18 1913856134",
+                username: "kratosKhan",
+                cellphone: "18 0294384783",
+                address_street: "17",
+                address_number: 212,
+                address_district: "SP",
+                address_city: "Ilha Solteira",
+                address_zip: "15.385-000"
+              }
+            ){
+              isSigned
+              username
+            }
+          }
+        `
+        const res = await request(app)
+          .post('/graphql')
+          .send({query})
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(200)
+
+          expect(res.body.data.signIn.isSigned).to.equal(true)
+          expect(res.body.data.signIn.username).to.equal("kratosKhan")
+            
+      })
+
       it("Should add a user of type tenant", (done) => {
 
         const query = `
@@ -57,18 +93,20 @@ describe("Authentication", () => {
           })
       })
 
-      after((done) => {
-        Tenant.collection.drop().then(()=>{done()})
+      after(async() => {
+        await Tenant.collection.drop()
+        await Admin.collection.drop()
       })
     })
 
     describe("Log In", () => {
-      let username, password = '12345'
+      let username, password = '12345', admin
 
       before(async() => {
         const payload = bulk.randomTenantPayload()
         username = payload.username
         await Tenant.create(payload)
+        admin = await Admin.create(bulk.randomAdminPayload())
       })
 
       it('Should log In', async () => {
@@ -103,8 +141,38 @@ describe("Authentication", () => {
 
       })
 
-      after((done)=>{
-        Tenant.collection.drop().then(()=>{done()})
+      it("Should log in an Admin", async() => {
+        username = admin.username
+
+        const query = `
+          mutation{
+            login(username: "${username}", password: "${password}"){
+              isLogged
+              username
+              sessionRestored
+              sessionUsername
+            }
+          }
+        `
+
+        const res = await request(app)
+          .post('/graphql')
+          .send({query})
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .catch((err)=>console.log(err))  
+
+        expect(res.body.data.login.isLogged).to.equal(true)
+        expect(res.body.data.login.username).to.not.equal(null)
+        expect(res.body.data.login.sessionUsername).to.equal(username)
+          
+        
+      })
+
+      after(async()=>{
+        await Tenant.collection.drop()
+        await Admin.collection.drop()
       })
     })
 
