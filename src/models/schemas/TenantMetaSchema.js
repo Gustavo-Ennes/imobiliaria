@@ -1,3 +1,5 @@
+const Mongoose = require('../../database/db')
+
 module.exports = new Mongoose.Schema({
   // visits array
   visits: [{
