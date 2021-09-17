@@ -1,4 +1,5 @@
 const Mongoose = require("../database/db")
+const DocumentSchema = require('./schemas/DocumentSchema')
 
 module.exports = new Mongoose.model(
   "Owner",
@@ -8,13 +9,8 @@ module.exports = new Mongoose.model(
     username: {type: String, required: true, unique: true},
     password: {type: String, required: true},
     cellphone: {type: String, required: true, unique: true},
-    documents: [
-      {
-        link: String,
-        status: String,
-        uploadDate: Date
-      }
-    ],    properties: [String],
+    documents: [DocumentSchema],
+    properties: [String],
     lands: [String],
     address_street: {type: String, required: true},
     address_number: {type: Number, required: true},

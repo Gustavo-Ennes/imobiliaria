@@ -1,4 +1,5 @@
 const Mongoose = require("../database/db")
+const DocumentSchema = require('./schemas/DocumentSchema')
 
 module.exports = new Mongoose.model(
   "Land",
@@ -7,11 +8,7 @@ module.exports = new Mongoose.model(
     size: {type: Number, required: true},
     infrastructures: [String],
     documents: [
-      {
-        link: String,
-        status: String,
-        uploadDate: Date
-      }
+      DocumentSchema
     ],
     address_street: {type: String, required: true},
     address_number: {type: Number, required: true},
