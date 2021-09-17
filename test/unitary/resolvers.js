@@ -1,6 +1,6 @@
 const resolvers = require('../../src/resolvers')
 const chai = require('chai')
-const { randomLandPayload, randomOwnerPayload, randomTenantPayload, randomPropertyPayload } = require('../../utils/bulk')
+const { randomLandPayload, randomOwnerPayload, randomTenantPayload, randomPropertyPayload, randomAdminPayload } = require('../../utils/bulk')
 const expect = chai.expect
 const Owner = require("../../src/models/Owner")
 const Land = require("../../src/models/Land")
@@ -369,6 +369,16 @@ describe("> Resolvers", () => {
         expect(res).to.have.property('isSigned')
         expect(res.isSigned).to.equal(true)
 
+      })
+
+      it("Should sing in a Admin user", async() => {
+        let input = randomAdminPayload(), type = 'admin'
+        input.password = '12345'
+
+        const res = await resolvers.signIn({input, type}, {})
+
+        expect(res).to.have.property('isSigned')
+        expect(res.isSigned).to.equal(true)
       })
 
       after(async() => {
