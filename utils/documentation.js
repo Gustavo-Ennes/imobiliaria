@@ -14,7 +14,9 @@ const linkExists = async(string) => {
     const strings = res.data.split('\n')
     return strings[0].indexOf('%PDF') !== -1
   }catch(err){
-    console.log(err)
+    if(!process.env.TEST){
+      console.log(err)
+    }
     return false
   }
 }
