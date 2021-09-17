@@ -176,6 +176,15 @@ describe("> Resolvers", () => {
     })
   })
   describe(" ~ property create", () => {
+
+    it("Should not allow a tenant to create a Property", async() => {
+      const t = await Tenant.create(randomTenantPayload())
+      const pPayload = randomPropertyPayload()
+      pPayload.ownerId = t._id
+      const res = await resolvers.createProperty({input: pPayload}, {})
+      expect(res).to.be.null
+
+    })
     it("Should return the created mongoose model", async() => {
       const o = await Owner.create(randomOwnerPayload())
       const pPayload = randomPropertyPayload()

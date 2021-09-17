@@ -9,5 +9,8 @@ module.exports = {
   checkAdmin: async(adminId) => {
     const a = await Admin.findOne({_id: adminId})
     return (a instanceof Admin)
+  },
+  checkAdminBySession: async() => {
+    
   }
 }

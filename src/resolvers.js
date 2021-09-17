@@ -110,7 +110,13 @@ const resolvers = {
   },
   createProperty: async(args, request) => {
     try{
-      const p = await Property.create(args.input)
+      isOwner = await checkOwner(args.input.ownerId)
+      isAdmin = await checkAdmin(args.input.ownerId)
+      let p = null
+      
+      if(isOwner || isAdmin){
+        p = await Property.create(args.input)
+      }
       return p
     }catch(err){
       console.log(err)
