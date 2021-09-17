@@ -4,10 +4,47 @@ const Owner = require("./models/Owner")
 const Property = require("./models/Property")
 const Tenant = require('./models/Tenant')
 const { checkOwner, checkAdmin } = require('../utils/validation')
+const Admin = require('./models/Admin')
 
 let isOwner, isAdmin
 
 const resolvers = {
+  admins: async(args, request) => {
+    try{
+      return await Admin.find(args.input)
+    }catch(err){
+      console.log(err)
+    }
+  },
+  adminById: async(args, request) => {
+    const a = await Admin.findOne(args.input)
+    return a
+  },
+  createAdmin: async(args, request) => {
+    try{      
+        const a  = await Admin.create(args.input)
+        return a
+      }catch(err){
+      console.log(err)
+    }
+  },
+  updateAdmin: async(args, request)=> {
+    try{
+      await Admin.updateOne({_id: args.id}, {$set: args.input})
+      const a = await Admin.findOne({_id: args.id})
+      return a
+    }catch(err){
+      console.log(err)
+    }
+  },
+  deleteAdmin: async(args, request) => {
+    try{
+      await Admin.deleteOne({_id: args.id})
+      return `Admin id ${args.id} deleted`
+    }catch(err){
+      console.log(err)
+    }
+  },
   lands: async(args, request) => {
     try{
         return await Land.find(args.input)
@@ -113,7 +150,7 @@ const resolvers = {
       isOwner = await checkOwner(args.input.ownerId)
       isAdmin = await checkAdmin(args.input.ownerId)
       let p = null
-      
+
       if(isOwner || isAdmin){
         p = await Property.create(args.input)
       }
@@ -244,11 +281,13 @@ const resolvers = {
     try{
       input.password = await encrypt(input.password)
 
-      if(type === 'tenant' || type === 'owner'){
+      if(type === 'tenant' || type === 'owner' || type === 'admin'){
         if(type === 'tenant'){  
           await resolvers.createTenant(args, request)
         }else if (type === 'owner'){
           await resolvers.createOwner(args, request)
+        } else if(type === 'admin'){
+          await resolvers.createAdmin(args, request)
         }
         isSigned = true
         username = input.username
