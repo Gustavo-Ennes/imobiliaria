@@ -4,19 +4,23 @@ const Tenant = require('../../src/models/Tenant')
 const Owner = require('../../src/models/Owner')
 const Land = require('../../src/models/Land')
 const Property = require('../../src/models/Property')
+const Admin = require('../../src/models/Admin')
 const app = require('../../app')
 const {
   randomTenantPayload,
   randomPropertyPayload,
   randomLandPayload,
-  randomOwnerPayload
+  randomOwnerPayload,
+  randomAdminPayload
 } = require('../../utils/bulk')
+
+
 
 describe(" ~ Documentation", () => {
   try{
 
     describe("add a document", () => {
-      let query, tUsername, oUsername, tenant, owner, land, property
+      let query, tUsername, oUsername, tenant, owner, land, property, admin
 
       before(async() => {
         //create one model of each
@@ -32,6 +36,7 @@ describe(" ~ Documentation", () => {
         const pPayload = randomPropertyPayload()
         pPayload.ownerId = owner._id
         property = new Property(pPayload)
+        admin = await Admin.create(randomAdminPayload())
 
         await tenant.save()
         await owner.save()
@@ -39,7 +44,42 @@ describe(" ~ Documentation", () => {
         await property.save()
       })
 
-      it("Should add document to a tenant", async() => {
+      // the username in context should belongs to an Admin or a Tenant
+      it("Should not add document to a tenant while being an Owner", async() => { 
+        query = `
+          mutation{
+            login(username: "${oUsername}", password: "12345"){
+              isLogged
+              sessionUsername
+              message
+            }
+            addDocumentation(
+              link: "https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf",
+              type: "tenant",
+              id: "${tenant._id}"
+            ){
+              message
+              result
+            }
+          }
+        `
+
+        const res = await request(app)
+          .post('/graphql')
+          .send({query})
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(200)
+        
+        console.log(`\n\nres.message: ${res.body.data.addDocumentation.message}`)
+
+        expect(res.body.data.login.isLogged).to.be.true
+        expect(res.body.data.addDocumentation).to.have.property('message')
+        expect(res.body.data.addDocumentation).to.have.property('result')
+        expect(res.body.data.addDocumentation.result).to.equal('fail')    
+      })
+
+      it("Should add document to a tenant while being a tenant", async() => {
         query = `
           mutation{
             login(username: "${tUsername}", password: "12345"){
@@ -71,6 +111,7 @@ describe(" ~ Documentation", () => {
         expect(res.body.data.addDocumentation).to.have.property('result')
         expect(res.body.data.addDocumentation.result).to.equal('success')          
       })
+
       it("Should add document to a owner", async() => {
         query = `
           mutation{
@@ -101,6 +142,38 @@ describe(" ~ Documentation", () => {
         expect(res.body.data.addDocumentation).to.have.property('message')
         expect(res.body.data.addDocumentation).to.have.property('result')
         expect(res.body.data.addDocumentation.result).to.equal('success')          
+      })
+
+      it("Should add document to an Owner being an Admin", async() => {
+        query = `
+          mutation{
+            login(username: "${admin.username}", password: "12345"){
+              isLogged
+              sessionUsername
+              message
+            }
+            addDocumentation(
+              link: "https://kidsspark.weebly.com/uploads/5/0/6/5/50658543/harry_potter_annd_the_sorcerers_stone.pdf",
+              type: "owner",
+              id: "${owner._id}"
+            ){
+              message
+              result
+            }
+          }
+        `
+
+        const res = await request(app)
+          .post('/graphql')
+          .send({query})
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(200)
+
+        expect(res.body.data.login.isLogged).to.be.true
+        expect(res.body.data.addDocumentation).to.have.property('message')
+        expect(res.body.data.addDocumentation).to.have.property('result')
+        expect(res.body.data.addDocumentation.result).to.equal('success') 
       })
 
       it("Should add document to a land", async() => {
@@ -134,8 +207,7 @@ describe(" ~ Documentation", () => {
         expect(res.body.data.addDocumentation).to.have.property('message')
         expect(res.body.data.addDocumentation).to.have.property('result')
         expect(res.body.data.addDocumentation.result).to.equal('success')          
-      })
-      
+      })      
 
       it("Should add document to a property", async() => {
         query = `
@@ -172,6 +244,7 @@ describe(" ~ Documentation", () => {
       
 
       after(async() => {
+        await Admin.collection.drop()
         await Tenant.collection.drop()
         await Owner.collection.drop()
         await Land.collection.drop()
