@@ -81,6 +81,15 @@ const randomPhone = () => {
   return string.trim()
 }
 
+const randomAdminPayload = () => {
+  return {
+    name: randomName(),
+    phone: randomPhone(),
+    username: randomUsername(),
+    password: simplePassword
+  }
+}
+
 
 
 const randomTenantPayload = () => {
