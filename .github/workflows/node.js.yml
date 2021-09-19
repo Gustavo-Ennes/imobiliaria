@@ -28,4 +28,4 @@ jobs:
     - run: npm run build --if-present
     - run: npm test
       env:       
-        DB_HOST_TEST: '${{ secrets.DB_HOST_TEST }}'
+        DB_HOST_TEST: "${{ secrets.DB_HOST_TEST }}"
