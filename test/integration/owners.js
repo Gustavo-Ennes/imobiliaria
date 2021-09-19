@@ -6,10 +6,10 @@ const chai = require('chai')
 const expect = chai.expect
 const { simplePassword } = require("../../utils/bulk")
 
-describe("> Owners", () =>{
+describe(" >> Owners << ", () =>{
   //check by name
 
-  describe(' ~ read', () => {
+  describe('~~~~~~~> read', () => {
     before((done) => {
       const payload = bulk.randomOwnerPayload()
       aux = payload.name
@@ -47,7 +47,7 @@ describe("> Owners", () =>{
 
   })
 
-  describe(' ~ write', () => {
+  describe('~~~~~~~> write', () => {
 
     it("Should add a owner", (done) => {
       const query = `
@@ -92,7 +92,7 @@ describe("> Owners", () =>{
     })
   })
 
-  describe(" ~ update", () => {
+  describe("~~~~~~~> update", () => {
     let id
     before((done) => {
       const payload = bulk.randomOwnerPayload()
@@ -141,7 +141,7 @@ describe("> Owners", () =>{
     })
   })
 
-  describe(" ~ delete", () => {
+  describe("~~~~~~~> delete", () => {
     let id
     before(( done ) => {
       Owner.create(bulk.randomOwnerPayload()).then((owner) => {

@@ -1,7 +1,7 @@
 const { expect } = require('chai')
 const stringify = require('../../utils/jsonStringify')
 
-describe(" ~ jsonStringify", () => {
+describe(" >> jsonStringify << ", () => {
   it("Should remove quotes from the keys of a stringified json",() => {
     const json = {
       "key1": "value1",

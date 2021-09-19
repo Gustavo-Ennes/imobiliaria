@@ -6,8 +6,8 @@ const Mongoose = require("../../src/database/db")
 
 
 
-describe("Database connection", () => {
-  it("Should be connected to Atlas", async() => {
+describe(" >> Database << ", () => {
+  it("~~~~~~~> Should be connected to Atlas", async() => {
 
     try{
       await Mongoose.connect(process.env.DB_HOST_TEST)

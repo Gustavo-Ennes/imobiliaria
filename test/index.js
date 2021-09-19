@@ -1,19 +1,20 @@
 const mongoose = require('../src/database/db')
 
-console.log(`
---------  REAL ESTATE GRAPHQL API TESTS --------\n\n
+console.log(`\n
+----------------  REAL ESTATE GRAPHQL API TESTS ----------------
   --o> developed by Gustavo Ennes
   --o> https://github.com/Gustavo-Ennes
   --o> https://linkedin.com/in/gustavo-ennes
   --o> https://ennes.dev
-  --o> Hail thyself! É o ministério!\n\n
+  --o> Hail thyself! É o ministério!
+----------------------------------------------------------------\n\n
 `)
 
-describe("Let's test this out...", () => {
+describe("Let's test this out...\n\n", () => {
 
   
 
-  describe(" --- UNIT TESTS --- ", () => {
+  describe("\n o|-|-|-|o  UNIT TESTS  o|-|-|-|o \n", () => {
     require('./unitary/crypt')
     require('./unitary/database')
     require('./unitary/documentation')
@@ -22,7 +23,7 @@ describe("Let's test this out...", () => {
     require('./unitary/utils')
   })
   
-  describe(" --- INTEGRATION TESTS --- ", () => {
+  describe("\n o|-|-|-|o  INTEGRATION TESTS  o|-|-|-|o \n", () => {
     require('./integration/authentication')
     require('./integration/documentation')
     require('./integration/lands')

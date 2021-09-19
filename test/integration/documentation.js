@@ -16,10 +16,10 @@ const {
 
 
 
-describe(" ~ Documentation", () => {
+describe(" >> Documentation << ", () => {
   try{
 
-    describe("add a document", () => {
+    describe("~~~~~~~> add a document", () => {
       let query, tUsername, oUsername, tenant, owner, land, property, admin
 
       before(async() => {
@@ -252,7 +252,7 @@ describe(" ~ Documentation", () => {
       })
     })
 
-    describe("get pending documents", () => {
+    describe("~~~~~~~> get pending documents", () => {
 
       let tenant, owner, property, land, type, obj
       const doc = {

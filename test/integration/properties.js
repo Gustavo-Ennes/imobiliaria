@@ -7,10 +7,10 @@ const chai = require('chai')
 const expect = chai.expect
 
 
-describe("> Properties", () =>{
+describe(" >> Properties << ", () =>{
   //check by name
 
-  describe(' ~ read', () => {
+  describe('~~~~~~~> read', () => {
     // in this I have to create a Owner to the Land because it's required
     before((done) => {
       const propertyPayload = bulk.randomPropertyPayload()
@@ -63,7 +63,7 @@ describe("> Properties", () =>{
 
   })
 
-  describe(' ~ write', () => {
+  describe('~~~~~~~> write', () => {
     let ownerId
     // adding the owner requisite
     before((done) => {
@@ -127,7 +127,7 @@ describe("> Properties", () =>{
     })
   })
 
-  describe(" ~ update", () => {
+  describe("~~~~~~~> update", () => {
     let id
     before((done) => {
       const ownerPayload = bulk.randomOwnerPayload()
@@ -185,7 +185,7 @@ describe("> Properties", () =>{
     })
   })
 
-  describe(" ~ delete", () => {
+  describe("~~~~~~~> delete", () => {
     let id
     before(( done ) => {
       const propertyPayload = bulk.randomPropertyPayload()

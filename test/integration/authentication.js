@@ -11,11 +11,11 @@ const expect = chai.expect
 const {randomOwnerPayload, randomTenantPayload, randomPropertyPayload, randomLandPayload} = require('../../utils/bulk')
 const Admin = require("../../src/models/Admin")
 
-describe("Authentication", () => {
+describe(" >> Authentication << ", () => {
 
   try{
 
-    describe("Sign In", () => {
+    describe("~~~~~~~> Sign In", () => {
       it("Should add a user of type Admin", async()=> {
         const query = `
           mutation{
@@ -99,7 +99,7 @@ describe("Authentication", () => {
       })
     })
 
-    describe("Log In", () => {
+    describe("~~~~~~~> Log In", () => {
       let username, password = '12345', admin
 
       before(async() => {
@@ -176,7 +176,7 @@ describe("Authentication", () => {
       })
     })
 
-    describe("session check", () => {
+    describe("~~~~~~~> session check", () => {
       let username
 
       before(async() => {

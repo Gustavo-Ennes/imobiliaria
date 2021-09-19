@@ -20,9 +20,9 @@ const tenantOrOwnerTest = (type) => {
   })
 }
 
-describe(" ~ Utils ", (done) => {
+describe(" >> Utils << ", (done) => {
 
-  describe("bulk", () => {
+  describe("~~~~~~~> bulk", () => {
 
     tenantOrOwnerTest("owner")
     tenantOrOwnerTest("tenant")

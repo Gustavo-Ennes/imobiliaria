@@ -7,10 +7,10 @@ const expect = chai.expect
 const simplePassword = bulk.simplePassword
 
 
-describe("> Tenants", () =>{
+describe(" >> Tenants << ", () =>{
   //check by name
 
-  describe(' ~ read', () => {
+  describe('~~~~~~~> read', () => {
     before((done) => {
       const payload = bulk.randomTenantPayload()
       aux = payload.name
@@ -48,7 +48,7 @@ describe("> Tenants", () =>{
 
   })
 
-  describe(' ~ write', () => {
+  describe('~~~~~~~> write', () => {
 
     it("Should add a tenant", (done) => {
       const query = `
@@ -93,7 +93,7 @@ describe("> Tenants", () =>{
     })
   })
 
-  describe(" ~ update", () => {
+  describe("~~~~~~~> update", () => {
     let id
     before((done) => {
       const payload = bulk.randomTenantPayload()
@@ -142,7 +142,7 @@ describe("> Tenants", () =>{
     })
   })
 
-  describe(" ~ delete", () => {
+  describe("~~~~~~~> delete", () => {
     let id
     before(( done ) => {
       Tenant.create(bulk.randomTenantPayload()).then((tenant) => {

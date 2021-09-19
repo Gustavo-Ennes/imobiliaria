@@ -8,10 +8,10 @@ const expect = chai.expect
 const {randomOwnerPayload} = require('../../utils/bulk')
 
 
-describe("> Lands", () =>{
+describe(" >> Lands << ", () =>{
   //check by name
 
-  describe(' ~ read', () => {
+  describe('~~~~~~~> read', () => {
     // in this I have to create a Owner to the Land because it's required
     before((done) => {
       try{
@@ -64,7 +64,7 @@ describe("> Lands", () =>{
 
   })
 
-  describe(' ~ write', () => {
+  describe('~~~~~~~> write', () => {
     let ownerId
     // adding the owner requisite
     before((done) => {
@@ -120,7 +120,7 @@ describe("> Lands", () =>{
     })
   })
 
-  describe(" ~ update", () => {
+  describe("~~~~~~~> update", () => {
     let id, realOwner
     before((done) => {
       const ownerPayload = bulk.randomOwnerPayload()
@@ -214,7 +214,7 @@ describe("> Lands", () =>{
     })
   })
 
-  describe(" ~ delete", () => {
+  describe("~~~~~~~> delete", () => {
     let id, username
     before(( done ) => {
       const landPayload = bulk.randomLandPayload()
