@@ -6,6 +6,15 @@ const Property = require('../src/models/Property')
 const Tenant = require("../src/models/Tenant")
 
 module.exports = {
+  isUser: async(username) => {
+    if(typeof username === 'string'){
+      const isAdmin = await checkAdminByUsername(username)
+      const isTenant = await checkTenantByUsername(username)
+      const isOwner = await checkOwnerByUsername(username)
+      return isAdmin|| isTenant || isOwner
+    }
+    return false
+  },
   checkOwner: async(ownerId) => {
     const o = await Owner.findOne({_id: ownerId})
     return (o instanceof Owner)
