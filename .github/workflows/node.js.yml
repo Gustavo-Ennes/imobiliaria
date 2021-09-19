@@ -23,7 +23,7 @@ jobs:
 
     - name: Hello world
       run: echo $DB_HOST_TEST
-      with:       
+      env:       
         DB_HOST_TEST: ${{ secrets.DB_HOST_TEST }}
     # - uses: actions/checkout@v2
     # - name: Use Node.js ${{ matrix.node-version }}
