@@ -23,7 +23,8 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'        
+        cache: 'npm' 
+      env:       
         DB_HOST_TEST: ${{ secrets.DB_HOST_TEST}}
     - run: npm ci
     - run: npm run build --if-present
