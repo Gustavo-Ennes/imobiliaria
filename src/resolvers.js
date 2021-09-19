@@ -3,7 +3,7 @@ const Land = require("./models/Land")
 const Owner = require("./models/Owner")
 const Property = require("./models/Property")
 const Tenant = require('./models/Tenant')
-const { checkOwnership, checkOwner, checkAdmin, checkTenantByUsername, checkAdminByUsername, checkOwnerByUsername } = require('../utils/validation')
+const { isUser, checkOwnership, checkOwner, checkAdmin, checkTenantByUsername, checkAdminByUsername, checkOwnerByUsername } = require('../utils/validation')
 const Admin = require('./models/Admin')
 
 
@@ -332,8 +332,7 @@ const resolvers = {
       const isUserAAdmin = await checkAdminByUsername(context.username)
       const isUserAOwner = await checkOwnerByUsername(context.username)
 
-      if(context.username){
-        
+      if(context.username){        
         
         switch(args.type){
           case 'tenant':
@@ -409,8 +408,10 @@ const resolvers = {
       return pendingDocuments.properties.length + pendingDocuments.lands.length +pendingDocuments.owners.length + pendingDocuments.tenants.length
     }
 
+    
+
     try{
-      if(context.username){
+      if(isUser(context.username)){
         if(Object.keys(args).length){
           switch (args.type) {
             case 'tenant':          
