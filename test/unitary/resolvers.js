@@ -10,6 +10,7 @@ const Admin = require('../../src/models/Admin')
 const request = require('supertest')
 const app = require('../../app')
 const JSONGraphqlStringify = require('../../utils/jsonStringify')
+const mongoose = require("../../src/database/db")
 
 describe("> Resolvers", () => {
 
@@ -202,20 +203,20 @@ describe("> Resolvers", () => {
 
   // UPDATE
   describe(" ~ land update", () => {
-    let alteredAttr, id
+    let alteredAttr, id, o
     const newSize = 100
 
     before(async() => {
-      const o = await Owner.create(randomOwnerPayload())
+      o = await Owner.create(randomOwnerPayload())
       const lPayload = randomLandPayload()
       lPayload.ownerId = o._id
-      const l = await resolvers.createLand({input: lPayload}, {})
+      const l = await resolvers.createLand({input: lPayload}, {username: o.username})
       alteredAttr = l.size
       id = l._id
     })
 
     it("Should alter a size field to 100", async() => {
-      await resolvers.updateLand({id:id, input:{size: 100}}, {})
+      await resolvers.updateLand({id:id, input:{size: 100}}, {username: o.username})
       const l = await Land.findOne({_id: id})
       expect(l.size).not.to.equal(alteredAttr)
       expect(l.size).to.equal(newSize)
@@ -292,17 +293,17 @@ describe("> Resolvers", () => {
 
   // DELETE 
   describe(" ~ delete land", () => {
-    let id
+    let id, o
 
     before(async() => {
-      const o = await Owner.create(randomOwnerPayload())
+      o = await Owner.create(randomOwnerPayload())
       const lPayload = randomLandPayload()
       lPayload.ownerId = o._id
       const l = await Land.create(lPayload)
       id = l._id
     })
     it("Should delete a land", async() => {
-      await resolvers.deleteLand({id}, {})
+      await resolvers.deleteLand({id}, {username: o.username})
       const l = await Land.findOne({_id:id})
       expect(l).to.equal(null)
     })
@@ -494,7 +495,9 @@ describe("> Resolvers", () => {
     })
 
     describe("documentation adder", () => {
-      let tId, oId, lId, pId, tenant, owner, property, land
+
+      let tId, oId, lId, pId, tenant, owner, property, land, admin
+
       before(async() => {
         const tPayload = randomTenantPayload()
         tenant = new Tenant(tPayload)
@@ -506,6 +509,8 @@ describe("> Resolvers", () => {
         const pPayload = randomPropertyPayload()
         pPayload.ownerId = owner._id
         property = new Property(pPayload)
+
+        admin = await Admin.create(randomAdminPayload())
 
         tId = tenant._id
         oId = owner._id
@@ -626,6 +631,7 @@ describe("> Resolvers", () => {
       const pPayload = randomPropertyPayload()
       pPayload.ownerId = owner._id
       property = new Property(pPayload)
+      admin = await Admin.create(randomAdminPayload())
 
       tId = tenant._id
       oId = owner._id
@@ -661,7 +667,7 @@ describe("> Resolvers", () => {
             id: owner._id
           },  
           {
-            username: tenant.username
+            username: owner.username
           }
         )
       }
@@ -674,7 +680,7 @@ describe("> Resolvers", () => {
             id: land._id
           },  
           {
-            username: tenant.username
+            username: owner.username
           }
         )
       }
@@ -687,30 +693,30 @@ describe("> Resolvers", () => {
             id: property._id
           },  
           {
-            username: tenant.username
+            username: admin.username
           }
         )
       }
     })
 
     it(`tenants should count ${tCounter} documents pending`, async() => {
-      const res = await resolvers.pendingDocumentation({id:tenant._id, type: 'tenant'}, {username: 'kratos'})
+      const res = await resolvers.pendingDocumentation({id:tenant._id, type: 'tenant'}, {username: admin.username})
       expect(res.tenants).to.have.lengthOf(tCounter)
     })
     it(`owners should count ${oCounter} documents pending`, async() => {
-      const res = await resolvers.pendingDocumentation({id:owner._id, type: 'owner'}, {username: 'kratos'})
+      const res = await resolvers.pendingDocumentation({id:owner._id, type: 'owner'}, {username:admin.username })
       expect(res.owners).to.have.lengthOf(oCounter)
     })
     it(`lands should count ${lCounter} documents pending`, async() => {
-      const res = await resolvers.pendingDocumentation({id:land._id, type: 'land'}, {username: 'kratos'})
+      const res = await resolvers.pendingDocumentation({id:land._id, type: 'land'}, {username: admin.username})
       expect(res.lands).to.have.lengthOf(lCounter)
     })
     it(`properties should count ${tCounter} documents pending`, async() => {
-      const res = await resolvers.pendingDocumentation({id:property._id, type: 'property'}, {username: 'kratos'})
+      const res = await resolvers.pendingDocumentation({id:property._id, type: 'property'}, {username: admin.username})
       expect(res.properties).to.have.lengthOf(pCounter)
     })
     it(`total should count ${tCounter + oCounter + lCounter + pCounter} documents pending`, async() => {
-      const res = await resolvers.pendingDocumentation({}, {username: 'kratos'})
+      const res = await resolvers.pendingDocumentation({}, {username: admin.username})
       expect(res.total).to.equal(tCounter + oCounter + lCounter + pCounter)
     })
   })

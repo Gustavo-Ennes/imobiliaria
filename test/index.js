@@ -1,19 +1,17 @@
 const mongoose = require('../src/database/db')
 
-const presentationText = `
+console.log(`
 --------  REAL ESTATE GRAPHQL API TESTS --------\n\n
   --o> developed by Gustavo Ennes
   --o> https://github.com/Gustavo-Ennes
   --o> https://linkedin.com/in/gustavo-ennes
   --o> https://ennes.dev
   --o> Hail thyself! É o ministério!\n\n
-`
+`)
 
-describe(presentationText, () => {
+describe("Let's test this out...", () => {
 
-  console.log(`
   
-  `)
 
   describe(" --- UNIT TESTS --- ", () => {
     require('./unitary/crypt')
