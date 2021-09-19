@@ -1,0 +1,32 @@
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x, 14.x, 16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'        
+      env:
+        DB_HOST: "mongodb+srv://kratos:7SEll.im_nad%2C@cluster0.fhhom.mongodb.net/imobiliaria?retryWrites=true&w=majority"
+        DB_HOST_TEST: "mongodb+srv://kratos:7SEll.im_nad%2C@cluster0.fhhom.mongodb.net/imobiliaria_test?retryWrites=true&w=majority"
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
