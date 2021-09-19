@@ -27,4 +27,4 @@ jobs:
         DB_HOST_TEST: ${{ secrets.DB_HOST_TEST}}
     - run: npm ci
     - run: npm run build --if-present
-    - run: DB_HOST_TEST=${DB_HOST_TEST}npm test
+    - run: npm test
