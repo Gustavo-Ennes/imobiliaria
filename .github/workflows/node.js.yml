@@ -24,9 +24,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'        
-      env:
-        DB_HOST: "mongodb+srv://kratos:7SEll.im_nad%2C@cluster0.fhhom.mongodb.net/imobiliaria?retryWrites=true&w=majority"
-        DB_HOST_TEST: "mongodb+srv://kratos:7SEll.im_nad%2C@cluster0.fhhom.mongodb.net/imobiliaria_test?retryWrites=true&w=majority"
+        DB_HOST: ${{secrets.DB_HOST}}
+        DB_HOST_TEST: ${{ secrets.DB_HOST_TEST}}
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
