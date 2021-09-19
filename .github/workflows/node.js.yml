@@ -10,7 +10,11 @@ on:
 
 jobs:
 
+
   build:
+  
+    env:       
+      DB_HOST_TEST: ${{secrets.DB_HOST_TEST}}
 
     runs-on: ubuntu-latest
 
@@ -24,7 +28,7 @@ jobs:
     - name: Hello world
       run: echo $DB_HOST_TEST
       env:       
-        DB_HOST_TEST: ${{ secrets.DB_HOST_TEST }}
+        DB_HOST_TEST: ${{secrets.DB_HOST_TEST}}
     # - uses: actions/checkout@v2
     # - name: Use Node.js ${{ matrix.node-version }}
     #   uses: actions/setup-node@v2
