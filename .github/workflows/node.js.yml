@@ -15,6 +15,7 @@ jobs:
   
     env:       
       DB_HOST_TEST: ${{secrets.DB_HOST_TEST}}
+      TEST: ${{secrets.TEST}}
 
     runs-on: ubuntu-latest
 
@@ -31,5 +32,5 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm' 
-    - run: npm install
+    - run: npm ci
     - run: npm test
