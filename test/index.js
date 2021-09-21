@@ -10,9 +10,8 @@ console.log(`\n
 ----------------------------------------------------------------\n\n
 `)
 
-describe("Let's test this out...\n\n", () => {
+describe("REAL ESTATE GRAPHQL API TESTS\n\n", () => {
 
-  
 
   describe("\n o|-|-|-|o  UNIT TESTS  o|-|-|-|o \n", () => {
     require('./unitary/crypt')

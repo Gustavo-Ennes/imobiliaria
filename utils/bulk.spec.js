@@ -1,6 +1,6 @@
 const { expect } = require('chai')
-const bulk = require('../../utils/bulk')
-const mongoose = require("../../src/database/db")
+const bulk = require('./bulk')
+const mongoose = require("../database/db")
 
 const tenantOrOwnerTest = (type) => {
   const string = type === "owner" ? "Should match owner payload fields" : "Should match tenant payload fields" 

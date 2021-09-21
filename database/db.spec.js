@@ -2,7 +2,7 @@ require("dotenv").config()
 
 const chai = require('chai')
 const expect = chai.expect
-const Mongoose = require("../../src/database/db")
+const Mongoose = require("./db")
 
 
 

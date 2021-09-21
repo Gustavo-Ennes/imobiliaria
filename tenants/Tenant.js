@@ -1,6 +1,6 @@
 const Mongoose = require("../database/db")
-const DocumentSchema = require('./schemas/DocumentSchema')
-const TenantMetaSchema = require('./schemas/TenantMetaSchema')
+const DocumentSchema = require('../documentation/schemas/DocumentSchema')
+const TenantMetaSchema = require('../tenants/schema/TenantMetaSchema')
 
 module.exports =  new Mongoose.model(
   "Tenant",

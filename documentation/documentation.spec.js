@@ -1,11 +1,11 @@
 const { expect } = require("chai")
-const { checkPdf } = require("../../utils/documentation")
-const Tenant = require("../../src/models/Tenant")
-const Owner = require("../../src/models/Owner")
-const Land = require("../../src/models/Land")
-const Property = require("../../src/models/Property")
-const Admin = require("../../src/models/Admin")
-const resolvers = require('../../src/resolvers')
+const { checkPdf } = require("./documentation")
+const Tenant = require("../tenants/Tenant")
+const Owner = require("../owners/Owner")
+const Land = require("../lands/Land")
+const Property = require("../properties/Property")
+const Admin = require("../admin/Admin")
+const resolvers = require('../config/resolvers')
 
 const {
   randomTenantPayload,
@@ -13,11 +13,10 @@ const {
   randomLandPayload,
   randomPropertyPayload,
   randomAdminPayload
-} = require("../../utils/bulk")
+} = require("../utils/bulk")
 
 
 describe(" >> Documentation << ", () => {  
-
   describe("~~~~~~~> pdf validation", () => {
 
     it("Should avoid pdf links without a .pdf extension", async() => {
@@ -40,8 +39,7 @@ describe(" >> Documentation << ", () => {
       expect(await checkPdf(rightLink)).to.equal(true)
     })
 
-  })
-  
+  }) 
   describe("~~~~~~~> documentation adder", () => {
 
     let tId, oId, lId, pId, tenant, owner, property, land, admin
@@ -158,7 +156,6 @@ describe(" >> Documentation << ", () => {
       await Property.collection.drop()
     })
   })
-
   describe("~~~~~~~> get pending documents", () => {
     let tId, oId, lId, pId, tenant, owner, property, land,
       tCounter = parseInt(1 + Math.random() * 4),

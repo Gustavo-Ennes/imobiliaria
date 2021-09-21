@@ -1,5 +1,5 @@
 const Mongoose = require("../database/db")
-const DocumentSchema = require('./schemas/DocumentSchema')
+const DocumentSchema = require('../documentation/schemas/DocumentSchema')
 
 module.exports = new Mongoose.model(
   "Owner",

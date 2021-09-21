@@ -1,6 +1,6 @@
 const { getRounds } = require("bcrypt")
 const { expect } = require("chai")
-const { encrypt, passwordMatch } = require("../../utils/crypt")
+const { encrypt, passwordMatch } = require("./crypt")
 
 describe(" >> Encryption << ", () => {
 

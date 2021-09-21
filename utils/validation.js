@@ -1,9 +1,8 @@
-const { KnownFragmentNamesRule } = require('graphql/validation')
-const Admin = require('../src/models/Admin')
-const Land = require('../src/models/Land')
-const Owner = require('../src/models/Owner')
-const Property = require('../src/models/Property')
-const Tenant = require("../src/models/Tenant")
+const Admin = require('../admin/Admin')
+const Land = require('../lands/Land')
+const Owner = require('../owners/Owner')
+const Property = require('../properties/Property')
+const Tenant = require("../tenants/Tenant")
 
 module.exports = {
   isUser: async(username) => {

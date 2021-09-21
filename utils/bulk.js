@@ -1,7 +1,7 @@
-const Tenant = require('../src/models/Tenant')
-const Owner = require('../src/models/Owner')
-const Property = require('../src/models/Property')
-const Land = require('../src/models/Land')
+const Tenant = require('../tenants/Tenant')
+const Owner = require('../owners/Owner')
+const Property = require('../properties/Property')
+const Land = require('../lands/Land')
 const simplePassword = '$2b$10$3b7HoDAlE2Yf58eMlkG.m.XNTORfe/YOv1j/sOkgWHPbVKbhO7d/O'
 
 const randomUsername = () => {

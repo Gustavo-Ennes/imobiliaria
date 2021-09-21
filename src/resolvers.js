@@ -1,10 +1,10 @@
 const { passwordMatch, encrypt } = require('../utils/crypt')
 const Land = require("./models/Land")
-const Owner = require("./models/Owner")
-const Property = require("./models/Property")
+const Owner = require("../owners/Owner")
+const Property = require("../properties/Property")
 const Tenant = require('./models/Tenant')
 const { isUser, checkOwnership, checkOwner, checkAdmin, checkTenantByUsername, checkAdminByUsername, checkOwnerByUsername } = require('../utils/validation')
-const Admin = require('./models/Admin')
+const Admin = require('../admin/Admin')
 
 
 let isOwner, isAdmin

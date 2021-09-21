@@ -27,8 +27,8 @@ const app = express();
 /*
   setup Graphql
 */
-const typeDefs = require('./src/typeDefs.js')
-const resolvers = require('./src/resolvers.js')
+const typeDefs = require('../config/typeDefs')
+const resolvers = require('../config/resolvers')
 
 const { graphqlHTTP } = require('express-graphql');
 const { buildSchema } = require('graphql');
